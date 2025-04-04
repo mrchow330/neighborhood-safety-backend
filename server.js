@@ -13,7 +13,7 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-// Define the Report Schema
+// Report Schema
 const reportSchema = new mongoose.Schema({
   report_id: { type: String, required: true },
   issueType: String,
@@ -24,7 +24,31 @@ const reportSchema = new mongoose.Schema({
   status: { type: String, default: "Submitted" }, 
 });
 
+// User Schema
+const userSchema = new mongoose.Schema({
+  first_name: { type: String, required: true },
+  last_name: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  phone_number: { type: String, required: false },
+  password: { type: String, required: true }, // Will hash passwords in the future
+  isModerator: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+});
+
+// Custom validation to ensure at least one of `email` or `phone_number` is provided
+userSchema.path('email').validate(function (value) {
+  return this.email || this.phone_number;
+}, 'A user must have either an email or a phone number.');
+
+userSchema.path('phone_number').validate(function (value) {
+  return this.email || this.phone_number;
+}, 'A user must have either an email or a phone number.');
+
+
 const Report = mongoose.model('Report', reportSchema, 'reports');
+
+const User = mongoose.model('User', userSchema, 'users');
 
 try {
   app.use('/features', express.static(path.join(__dirname, 'features')));
@@ -39,8 +63,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/api-tester.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'features', 'api-tester.html'));
+app.get('/api-report-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-report-tester.html'));
 });
 
 // Variable to track the last time the server was "running"
@@ -89,6 +113,29 @@ app.post('/api/reports', async (req, res) => {
   }
 });
 
+// API Route to Create a User Account
+app.post('/api/users', async (req, res) => {
+  try {
+    const { first_name, last_name, username, email, phone_number, password } = req.body;
+
+    // Validate input
+    if (!first_name || !last_name || !username || !email || !password) {
+      return res.status(400).json({ error: 'First name, last name, username, email, and password are required' });
+    }
+
+    // Create a new user
+    const user = new User({ first_name, last_name, username, email, phone_number, password });
+    await user.save();
+
+    res.status(201).json({ message: 'User account created successfully', user });
+  } catch (err) {
+    if (err.code === 11000) {
+      // Handle duplicate key error (e.g., username or email already exists)
+      return res.status(400).json({ error: 'Username or email already exists' });
+    }
+    res.status(500).json({ error: 'Failed to create user account' });
+  }
+});
 
 // Export for Vercel
 module.exports = app;
