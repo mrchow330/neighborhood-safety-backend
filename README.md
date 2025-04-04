@@ -2,6 +2,19 @@
 
 This repository contains the backend API for the Neighborhood Safety App. The backend is built using Node.js and Express.js and is responsible for handling user-submitted safety reports, storing them in a MongoDB database, and providing endpoints for interacting with the data. This API acts as a server to create the main connection and communication between the app and our MongoDB database remotely.
 
+## Dependencies
+
+The following dependencies are required to run this project:
+
+- **Required**:
+  - `express`: For building the server and handling API routes.
+  - `mongoose`: For connecting to and interacting with the MongoDB database.
+  - `dotenv`: For managing environment variables securely.
+  - `cors`: For enabling cross-origin resource sharing.
+
+- **Optional**:
+  - `nodemon`: For automatically restarting the server during development when file changes are detected.
+
 ## Features
 
 - **Submit Reports**: User reports can be submitted to our database using this server.
@@ -32,14 +45,12 @@ This repository contains the backend API for the Neighborhood Safety App. The ba
    npm install
    ```
 
-   The following dependencies must be installed:
+   Dependencies to install:
    - `express`
    - `mongoose`
    - `dotenv`
    - `cors`
-
-   The following dependenceies are optional:
-   - `nodemon`: A tool that automatically restarts the server when file changes are detected during development.
+   - `nodemon` (optional)
 
 
 3. Set up environment variables:
