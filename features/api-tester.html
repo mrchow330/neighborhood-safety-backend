@@ -63,15 +63,39 @@
   <script>
     document.getElementById('reportForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+  
+      // Generate a unique report ID (e.g., using a timestamp)
+      const reportId = `report_${Date.now()}`;
+  
+      // Collect form data
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
-      const response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      document.getElementById('responseMessage').textContent = result.message || 'Error submitting report';
+  
+      // Construct the reportData object
+      const reportData = {
+        report_id: reportId, // Unique report ID
+        issueType: data.issueType,
+        location: data.location,
+        description: data.description,
+        photoUri: "", // Placeholder for now (e.g., if no photo is uploaded)
+      };
+  
+      // Send the reportData to the API
+      try {
+        const response = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reportData),
+        });
+  
+        const result = await response.json();
+        document.getElementById('responseMessage').textContent =
+          result.message || 'Error submitting report';
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('responseMessage').textContent =
+          'An unexpected error occurred';
+      }
     });
   </script>
 </body>
