@@ -20,6 +20,3 @@ This repository contains the backend API for the Neighborhood Safety App. The ba
    ```bash
    git clone <repository-url>
    cd neighborhood-safety-backend
-
-## Notes
-This took way too long to make. :(
