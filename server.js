@@ -31,19 +31,19 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, unique: true, sparse: true },
   phone_number: { type: String, sparse: true },
-  password: { type: String, required: true }, // Will hash passwords in the future
+  password: { type: String, unique: true, required: true }, // Will hash passwords in the future
   isModerator: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
 // Custom validation to ensure at least one of `email` or `phone_number` is provided
-userSchema.path('email').validate(function (value) {
-  return this.email || this.phone_number;
-}, 'A user must have either an email or a phone number.');
-
-userSchema.path('phone_number').validate(function (value) {
-  return this.email || this.phone_number;
-}, 'A user must have either an email or a phone number.');
+userSchema.pre('validate', function (next) {
+  if (!this.email && !this.phone_number) {
+    next(new Error('A user must have either an email or a phone number.'));
+  } else {
+    next();
+  }
+});
 
 
 const Report = mongoose.model('Report', reportSchema, 'reports');
@@ -123,8 +123,13 @@ app.post('/api/users', async (req, res) => {
     const { first_name, last_name, username, email, phone_number, password } = req.body;
 
     // Validate input
-    if (!first_name || !last_name || !username || !email || !password) {
-      return res.status(400).json({ error: 'First name, last name, username, email, and password are required' });
+    if (!first_name || !last_name || !username || !password) {
+      return res.status(400).json({ error: 'First name, last name, username, and password are required' });
+    }
+
+    // Ensure at least one of email or phone_number is provided
+    if (!email && !phone_number) {
+      return res.status(400).json({ error: 'You must provide either an email or a phone number.' });
     }
 
     // Create a new user
@@ -134,8 +139,8 @@ app.post('/api/users', async (req, res) => {
     res.status(201).json({ message: 'User account created successfully', user });
   } catch (err) {
     if (err.code === 11000) {
-      // Handle duplicate key error (e.g., username or email already exists)
-      return res.status(400).json({ error: 'Username or email already exists' });
+      // Handle duplicate key error (e.g., username, email, or phone_number already exists)
+      return res.status(400).json({ error: 'Username, email, or phone number already exists' });
     }
     res.status(500).json({ error: 'Failed to create user account' });
   }
