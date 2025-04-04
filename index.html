@@ -71,7 +71,7 @@
       healthStatus.classList.remove('error', 'connecting');
       healthStatus.classList.add('ok');
     } else if (health.status === 'Server is connecting to the database') {
-      healthStatus.textContent = "Server is connecting to the database";
+      healthStatus.textContent = "Server is under maintenance";
       healthStatus.classList.remove('ok', 'error');
       healthStatus.classList.add('connecting');
     } else {

@@ -73,11 +73,11 @@ app.get('/api/health', async (req, res) => {
     if (dbState === 1) {
       statusMessage = 'Server is running';
     } else if (dbState === 2) {
-      statusMessage = 'Server is under maintenance';
+      statusMessage = 'Server is connecting to the database';
     } else {
       statusMessage = 'Server is currently down';
     }
-
+    
     res.status(200).json({
       status: statusMessage,
       database: dbStatus,
