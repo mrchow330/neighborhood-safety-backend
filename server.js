@@ -39,8 +39,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/test.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'features', 'test.html'));
+app.get('/api-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-tester.html'));
 });
 
 // API Route to Submit Reports
