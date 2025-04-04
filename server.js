@@ -43,20 +43,30 @@ app.get('/api-tester.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'api-tester.html'));
 });
 
-// Health Check Endpoint
-// This endpoint checks the health of the API and database connection
+// Variable to track the last time the server was "running"
+let lastUpTime = null;
+
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {
   try {
     const dbState = mongoose.connection.readyState;
 
     // Determine the overall server status
-    const statusMessage = dbState === 1 ? 'Server is running' : 'Server is down';
+    const isRunning = dbState === 1;
+    const statusMessage = isRunning ? 'Server is running' : 'Server is down';
+
+    // Update the lastUpTime if the server is running
+    if (isRunning && !lastUpTime) {
+      lastUpTime = new Date(); // Set the last "up" time
+    } else if (!isRunning) {
+      lastUpTime = null; // Reset the last "up" time if the server is down
+    }
 
     res.status(200).json({
       status: statusMessage,
-      database: dbState === 1 ? 'Connected' : 'Disconnected',
+      database: isRunning ? 'Connected' : 'Disconnected',
       uptime: process.uptime(),
+      lastUpTime: lastUpTime ? lastUpTime.toISOString() : null, // Include the last "up" time
       timestamp: new Date().toISOString(),
     });
   } catch (err) {

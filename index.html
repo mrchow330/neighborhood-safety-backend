@@ -38,6 +38,12 @@
     .status.error {
       color: #ff0000; /* Bright red for "down" */
     }
+    .uptime {
+      font-family: Arial, sans-serif; /* Normal font for uptime */
+      font-size: 1rem; /* Normal font size */
+      color: #ffffff; /* White text for uptime */
+      margin-top: 1rem; /* Add spacing below the status */
+    }
   </style>
   <!-- Link to Google Fonts for retro style -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -51,6 +57,7 @@
     <p>Use the API endpoints to interact with the system.</p>
     <p><a href="/api-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Tester</a></p>
     <div id="healthStatus" class="status">Checking API health...</div>
+    <div id="uptime" class="uptime"></div> <!-- Uptime text -->
   </main>
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
@@ -61,25 +68,44 @@
         const response = await fetch('/api/health');
         if (!response.ok) throw new Error('Server returned an error');
         const health = await response.json();
-  
+
         const healthStatus = document.getElementById('healthStatus');
+        const uptimeElement = document.getElementById('uptime');
+
         if (health.status === 'Server is running') {
           healthStatus.textContent = "Server is running";
           healthStatus.classList.remove('error');
           healthStatus.classList.add('ok');
+
+          // Display uptime
+          if (health.lastUpTime) {
+            const lastUpTime = new Date(health.lastUpTime);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - lastUpTime) / 1000);
+            const diffInMinutes = Math.floor(diffInSeconds / 60);
+            const diffInHours = Math.floor(diffInMinutes / 60);
+
+            const uptimeMessage = `Uptime: ${diffInHours}h ${diffInMinutes % 60}m ${diffInSeconds % 60}s`;
+            uptimeElement.textContent = uptimeMessage;
+          } else {
+            uptimeElement.textContent = ""; // Clear uptime if not available
+          }
         } else {
           healthStatus.textContent = "Server is down";
           healthStatus.classList.remove('ok');
           healthStatus.classList.add('error');
+          uptimeElement.textContent = ""; // Clear uptime when server is down
         }
       } catch (error) {
         const healthStatus = document.getElementById('healthStatus');
+        const uptimeElement = document.getElementById('uptime');
         healthStatus.textContent = "Server is down";
         healthStatus.classList.remove('ok');
         healthStatus.classList.add('error');
+        uptimeElement.textContent = ""; // Clear uptime on error
       }
     }
-  
+
     // Check health status every 5 seconds
     fetchHealthStatus(); // Run immediately on page load
     setInterval(fetchHealthStatus, 5000);
