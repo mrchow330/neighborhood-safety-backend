@@ -36,7 +36,7 @@
       color: #00ff00; /* Bright green for "running" */
     }
     .status.error {
-      color: #ff0000; /* Bright red for "down" */
+      color: #ff7700; /* Bright red for "down" */
     }
   </style>
   <!-- Link to Google Fonts for retro style -->
@@ -68,7 +68,7 @@
         healthStatus.classList.add('ok');
       } catch (error) {
         const healthStatus = document.getElementById('healthStatus');
-        healthStatus.textContent = "Server is currently down";
+        healthStatus.textContent = "Server is under maintainence";
         healthStatus.classList.remove('ok');
         healthStatus.classList.add('error');
       }
