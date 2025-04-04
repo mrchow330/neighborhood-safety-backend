@@ -108,9 +108,11 @@
       }
     }
 
-    // Check health status every second
-    fetchHealthStatus(); // Run immediately on page load
-    setInterval(fetchHealthStatus, 1000);
+    // Delay the initial health check by 3 seconds after the page loads
+  setTimeout(() => {
+    fetchHealthStatus(); 
+    setInterval(fetchHealthStatus, 1000); // Check health status every second
+  }, 5000); 
   </script>
 </body>
 </html>
