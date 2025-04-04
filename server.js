@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+  res.sendFile(path.join(__dirname, 'features', 'test.html'));
 });
 
 // API Route to Submit Reports
