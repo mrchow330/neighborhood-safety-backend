@@ -27,16 +27,20 @@
       color: #666;
     }
     .status {
-      font-size: 1.2rem;
-      margin-top: 1rem;
+      font-family: 'Press Start 2P', monospace; /* 8-bit style font */
+      font-size: 2.5rem; /* Larger text size */
+      margin-top: 5rem; /* Move it lower */
+      text-transform: uppercase; /* Make text uppercase */
     }
     .status.ok {
-      color: green;
+      color: #00ff00; /* Bright green for "running" */
     }
     .status.error {
-      color: red;
+      color: #ff0000; /* Bright red for "down" */
     }
   </style>
+  <!-- Link to Google Fonts for retro style -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
