@@ -61,17 +61,22 @@
         const response = await fetch('/api/health');
         if (!response.ok) throw new Error('Server returned an error');
         const health = await response.json();
-
+  
         const healthStatus = document.getElementById('healthStatus');
         healthStatus.textContent = "Server is running";
+        healthStatus.classList.remove('error');
         healthStatus.classList.add('ok');
       } catch (error) {
         const healthStatus = document.getElementById('healthStatus');
         healthStatus.textContent = "Server is currently down";
+        healthStatus.classList.remove('ok');
         healthStatus.classList.add('error');
       }
     }
-    fetchHealthStatus();
+  
+    // Check every 10 seconds
+    fetchHealthStatus(); // run immediately on page load
+    setInterval(fetchHealthStatus, 5000);
   </script>
 </body>
 </html>
