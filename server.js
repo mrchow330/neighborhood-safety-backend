@@ -39,6 +39,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/test.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test.html'));
+});
+
 // API Route to Submit Reports
 app.post('/api/reports', async (req, res) => {
   try {
