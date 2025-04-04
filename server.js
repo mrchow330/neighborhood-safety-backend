@@ -48,11 +48,38 @@ app.get('/api-tester.html', (req, res) => {
 app.get('/api/health', async (req, res) => {
   try {
     const dbState = mongoose.connection.readyState;
-    console.log('MongoDB Connection State:', dbState); // Debugging log
 
-    const dbStatus = dbState === 1 ? 'Connected' : 'Disconnected';
+    // Map the connection state to a human-readable status
+    let dbStatus;
+    switch (dbState) {
+      case 0:
+        dbStatus = 'Disconnected';
+        break;
+      case 1:
+        dbStatus = 'Connected';
+        break;
+      case 2:
+        dbStatus = 'Connecting';
+        break;
+      case 3:
+        dbStatus = 'Disconnecting';
+        break;
+      default:
+        dbStatus = 'Unknown';
+    }
+
+    // Determine the overall server status
+    let statusMessage;
+    if (dbState === 1) {
+      statusMessage = 'Server is running';
+    } else if (dbState === 2) {
+      statusMessage = 'Server is under maintenance';
+    } else {
+      statusMessage = 'Server is currently down';
+    }
+
     res.status(200).json({
-      status: dbStatus === 'Connected' ? 'Server is running' : 'Server is currently down',
+      status: statusMessage,
       database: dbStatus,
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
