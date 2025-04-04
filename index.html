@@ -38,9 +38,6 @@
     .status.error {
       color: #ff0000; /* Bright red for "down" */
     }
-    .status.connecting {
-      color: #ffa500; /* Orange for "maintainence" */
-    }
   </style>
   <!-- Link to Google Fonts for retro style -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -60,34 +57,32 @@
   </footer>
   <script>
     async function fetchHealthStatus() {
-  try {
-    const response = await fetch('/api/health');
-    if (!response.ok) throw new Error('Server returned an error');
-    const health = await response.json();
-
-    const healthStatus = document.getElementById('healthStatus');
-    if (health.status === 'Server is running') {
-      healthStatus.textContent = "Server is running";
-      healthStatus.classList.remove('error', 'connecting');
-      healthStatus.classList.add('ok');
-    } else if (health.status === 'Server is connecting to the database') {
-      healthStatus.textContent = "Server is under maintenance";
-      healthStatus.classList.remove('ok', 'error');
-      healthStatus.classList.add('connecting');
-    } else {
-      healthStatus.textContent = "Server is currently down";
-      healthStatus.classList.remove('ok', 'connecting');
-      healthStatus.classList.add('error');
+      try {
+        const response = await fetch('/api/health');
+        if (!response.ok) throw new Error('Server returned an error');
+        const health = await response.json();
+  
+        const healthStatus = document.getElementById('healthStatus');
+        if (health.status === 'Server is running') {
+          healthStatus.textContent = "Server is running";
+          healthStatus.classList.remove('error');
+          healthStatus.classList.add('ok');
+        } else {
+          healthStatus.textContent = "Server is down";
+          healthStatus.classList.remove('ok');
+          healthStatus.classList.add('error');
+        }
+      } catch (error) {
+        const healthStatus = document.getElementById('healthStatus');
+        healthStatus.textContent = "Server is down";
+        healthStatus.classList.remove('ok');
+        healthStatus.classList.add('error');
+      }
     }
-  } catch (error) {
-    const healthStatus = document.getElementById('healthStatus');
-    healthStatus.textContent = "Server is currently down";
-    healthStatus.classList.remove('ok', 'connecting');
-    healthStatus.classList.add('error');
-  }
-}
-    fetchHealthStatus();
-    setInterval(fetchHealthStatus, 5000); // Check every minute
+  
+    // Check health status every 5 seconds
+    fetchHealthStatus(); // Run immediately on page load
+    setInterval(fetchHealthStatus, 5000);
   </script>
 </body>
 </html>

@@ -45,42 +45,17 @@ app.get('/api-tester.html', (req, res) => {
 
 // Health Check Endpoint
 // This endpoint checks the health of the API and database connection
+// Health Check Endpoint
 app.get('/api/health', async (req, res) => {
   try {
     const dbState = mongoose.connection.readyState;
 
-    // Map the connection state to a human-readable status
-    let dbStatus;
-    switch (dbState) {
-      case 0:
-        dbStatus = 'Disconnected';
-        break;
-      case 1:
-        dbStatus = 'Connected';
-        break;
-      case 2:
-        dbStatus = 'Connecting';
-        break;
-      case 3:
-        dbStatus = 'Disconnecting';
-        break;
-      default:
-        dbStatus = 'Unknown';
-    }
-
     // Determine the overall server status
-    let statusMessage;
-    if (dbState === 1) {
-      statusMessage = 'Server is running';
-    } else if (dbState === 2) {
-      statusMessage = 'Server is connecting to the database';
-    } else {
-      statusMessage = 'Server is currently down';
-    }
-    
+    const statusMessage = dbState === 1 ? 'Server is running' : 'Server is down';
+
     res.status(200).json({
       status: statusMessage,
-      database: dbStatus,
+      database: dbState === 1 ? 'Connected' : 'Disconnected',
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
     });
