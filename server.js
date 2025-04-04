@@ -67,6 +67,10 @@ app.get('/api-report-tester.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'api-report-tester.html'));
 });
 
+app.get('/api-user-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-user-tester.html'));
+});
+
 // Variable to track the last time the server was "running"
 let lastUpTime = null;
 
