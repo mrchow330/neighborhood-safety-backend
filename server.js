@@ -92,8 +92,7 @@ app.get('/api/health', async (req, res) => {
     res.status(200).json({
       status: statusMessage,
       database: isRunning ? 'Connected' : 'Disconnected',
-      uptime: process.uptime(),
-      lastUpTime: lastUpTime ? lastUpTime.toISOString() : null, // Include the last "up" time
+      uptime: process.uptime(), // Total uptime since the server started
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
