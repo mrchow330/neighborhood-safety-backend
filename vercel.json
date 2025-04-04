@@ -6,6 +6,9 @@
     "routes": [
       { "src": "/features/(.*)", "dest": "/features/$1" },
       { "src": "/(.*)", "dest": "server.js" }
-    ]
+    ],
+    "static": {
+    "features": "features"
+  }
   }
   
