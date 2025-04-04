@@ -26,8 +26,11 @@ const reportSchema = new mongoose.Schema({
 
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
+const path = require('path');
+
+// Serve a simple HTML page for the root route
 app.get('/', (req, res) => {
-  res.send('Welcome to the Neighborhood Safety API!');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // API Route to Submit Reports
@@ -40,6 +43,7 @@ app.post('/api/reports', async (req, res) => {
     res.status(500).json({ error: 'Failed to submit report' });
   }
 });
+
 
 // Export for Vercel
 module.exports = app;
