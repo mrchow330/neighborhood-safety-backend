@@ -29,8 +29,8 @@ const userSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
-  email: { type: String },
-  phone_number: { type: String },
+  email: { type: String, unique: true, sparse: true},
+  phone_number: { type: String, unique: true, sparse: true },
   password: { type: String, required: true }, // Will hash passwords in the future
   isModerator: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
@@ -138,8 +138,8 @@ app.post('/api/users', async (req, res) => {
     res.status(201).json({ message: 'User account created successfully', user });
   } catch (err) {
     if (err.code === 11000) {
-      // Handle duplicate key error (e.g., username, email, or phone_number already exists)
-      return res.status(400).json({ error: 'Username, email, or phone number already exists' });
+      // Handle duplicate key error (e.g., username already exists)
+      return res.status(400).json({ error: 'Username already exists' });
     }
     res.status(500).json({ error: 'Failed to create user account' });
   }
