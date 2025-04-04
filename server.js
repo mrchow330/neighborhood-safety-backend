@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, unique: true, sparse: true },
   phone_number: { type: String, sparse: true },
-  password: { type: String, unique: true, required: true }, // Will hash passwords in the future
+  password: { type: String, required: true }, // Will hash passwords in the future
   isModerator: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
