@@ -26,6 +26,16 @@
       font-size: 0.9rem;
       color: #666;
     }
+    .status {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+    .status.ok {
+      color: green;
+    }
+    .status.error {
+      color: red;
+    }
   </style>
 </head>
 <body>
@@ -36,9 +46,28 @@
     <p>This is the backend service for the Neighborhood Safety App.</p>
     <p>Use the API endpoints to interact with the system.</p>
     <p><a href="/api-tester.html" style="color: #4CAF50; text-decoration: none;">Go to API Tester</a></p>
+    <div id="healthStatus" class="status">Checking API health...</div>
   </main>
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
+  <script>
+    async function fetchHealthStatus() {
+      try {
+        const response = await fetch('/api/health');
+        if (!response.ok) throw new Error('Server returned an error');
+        const health = await response.json();
+
+        const healthStatus = document.getElementById('healthStatus');
+        healthStatus.textContent = "Server is running";
+        healthStatus.classList.add('ok');
+      } catch (error) {
+        const healthStatus = document.getElementById('healthStatus');
+        healthStatus.textContent = "Server is currently down";
+        healthStatus.classList.add('error');
+      }
+    }
+    fetchHealthStatus();
+  </script>
 </body>
 </html>

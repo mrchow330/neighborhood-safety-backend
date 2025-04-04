@@ -43,6 +43,28 @@ app.get('/api-tester.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'api-tester.html'));
 });
 
+// Health Check Endpoint
+// This endpoint checks the health of the API and database connection
+app.get('/api/health', async (req, res) => {
+  try {
+    // Check database connection
+    const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+
+    res.status(200).json({
+      status: 'Server is okay',
+      uptime: process.uptime(), // Server uptime in seconds
+      database: dbStatus,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Server is currently down',
+      error: err.message,
+    });
+  }
+});
+
 // API Route to Submit Reports
 app.post('/api/reports', async (req, res) => {
   try {
