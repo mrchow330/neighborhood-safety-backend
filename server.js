@@ -138,9 +138,13 @@ app.post('/api/users', async (req, res) => {
     res.status(201).json({ message: 'User account created successfully', user });
   } catch (err) {
     if (err.code === 11000) {
+      // Log the entire error to the console
+      console.error('Duplicate key error:', err);
+
       // Handle duplicate key error
       return res.status(400).json({ error: 'Username or email already exists' });
     }
+    console.error('Error creating user:', err); // Log other errors
     res.status(500).json({ error: 'Failed to create user account' });
   }
 });
