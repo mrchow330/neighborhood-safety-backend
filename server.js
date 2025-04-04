@@ -24,6 +24,31 @@ const reportSchema = new mongoose.Schema({
   status: { type: String, default: "Submitted" }, 
 });
 
+<<<<<<< Updated upstream
+=======
+// User Schema
+const userSchema = new mongoose.Schema({
+  first_name: { type: String, required: true },
+  last_name: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String },
+  phone_number: { type: String },
+  password: { type: String, required: true }, // Will hash passwords in the future
+  isModerator: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+});
+
+// Custom validation to ensure at least one of `email` or `phone_number` is provided
+userSchema.pre('validate', function (next) {
+  if (!this.email && !this.phone_number) {
+    next(new Error('A user must have either an email or a phone number.'));
+  } else {
+    next();
+  }
+});
+
+
+>>>>>>> Stashed changes
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
 try {
