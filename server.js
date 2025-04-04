@@ -132,7 +132,7 @@ app.post('/api/users', async (req, res) => {
     }
 
     // Create a new user
-    const user = new User({ first_name, last_name, username, email, phone_number, password });
+    const user = new User({ first_name, last_name, username, email: email || null, phone_number: phone_number || null, password });
     await user.save();
 
     res.status(201).json({ message: 'User account created successfully', user });
