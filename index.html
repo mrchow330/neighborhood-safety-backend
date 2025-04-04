@@ -84,8 +84,10 @@
             const diffInSeconds = Math.floor((now - lastUpTime) / 1000);
             const diffInMinutes = Math.floor(diffInSeconds / 60);
             const diffInHours = Math.floor(diffInMinutes / 60);
+            const diffInDays = Math.floor(diffInHours / 24);
+            const diffInWeeks = Math.floor(diffInDays / 7);
 
-            const uptimeMessage = `Uptime: ${diffInHours}h ${diffInMinutes % 60}m ${diffInSeconds % 60}s`;
+            const uptimeMessage = `Uptime: ${diffInWeeks}w ${diffInDays % 7}d ${diffInHours % 24}h ${diffInMinutes % 60}m ${diffInSeconds % 60}s`;
             uptimeElement.textContent = uptimeMessage;
           } else {
             uptimeElement.textContent = ""; // Clear uptime if not available
