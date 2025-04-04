@@ -5,11 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API Health Status</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 2rem; }
-    .status { font-size: 1.5rem; margin-top: 1rem; }
-    .status.ok { color: green; }
-    .status.error { color: red; }
+    body {
+      font-family: 'Press Start 2P', monospace; /* 8-bit style font */
+      text-align: center;
+      margin: 2rem;
+      background-color: #000; /* Black background for a retro look */
+      color: #00ff00; /* Green text for retro style */
+    }
+    .status {
+      font-size: 2.5rem; /* Larger text size */
+      margin-top: 5rem; /* Move it lower */
+      text-transform: uppercase; /* Make text uppercase */
+    }
+    .status.ok {
+      color: #00ff00; /* Bright green for "running" */
+    }
+    .status.error {
+      color: #ff0000; /* Bright red for "down" */
+    }
   </style>
+  <!-- Link to Google Fonts for retro style -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
   <h1>API Health Status</h1>
