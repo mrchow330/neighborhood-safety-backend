@@ -46,8 +46,7 @@ userSchema.pre('validate', function (next) {
 });
 
 
-<<<<<<< Updated upstream
-=======
+
 // User Schema
 const userSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
@@ -69,8 +68,6 @@ userSchema.pre('validate', function (next) {
   }
 });
 
-
->>>>>>> Stashed changes
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
 const User = mongoose.model('User', userSchema, 'users');
