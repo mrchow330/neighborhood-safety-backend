@@ -26,6 +26,12 @@ const reportSchema = new mongoose.Schema({
 
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
+try {
+  app.use('/features', express.static(path.join(__dirname, 'features')));
+} catch (err) {
+  console.error('Error setting up static middleware:', err);
+}
+
 const path = require('path');
 
 // Serve a simple HTML page for the root route
