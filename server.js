@@ -28,6 +28,8 @@ const Report = mongoose.model('Report', reportSchema, 'reports');
 
 app.use('/features', express.static(path.join(__dirname, 'features')));
 
+const path = require('path');
+
 // Serve a simple HTML page for the root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
