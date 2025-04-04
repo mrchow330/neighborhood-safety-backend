@@ -26,7 +26,7 @@ const reportSchema = new mongoose.Schema({
 
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
-const path = require('path');
+app.use('/features', express.static(path.join(__dirname, 'features')));
 
 // Serve a simple HTML page for the root route
 app.get('/', (req, res) => {
