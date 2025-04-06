@@ -26,6 +26,7 @@ app.get('/', (req, res) => {
 app.use('/api/reports', require('./api/reports'));
 app.use('/api/users', require('./api/users'));
 app.use('/api/health', require('./api/health'));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Export for Vercel
 module.exports = app;
