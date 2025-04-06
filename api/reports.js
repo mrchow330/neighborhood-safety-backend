@@ -1,9 +1,8 @@
 const express = require('express');
-const Report = require('../models/Report'); // Import Report model
-
 const router = express.Router();
+const Report = require('../models/Report'); // Assuming you move the Report schema to a separate file
 
-// POST /api/reports - Create a new report
+// API Route to Submit Reports
 router.post('/', async (req, res) => {
   try {
     const report = new Report(req.body);

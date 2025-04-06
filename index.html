@@ -4,47 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HoodWatch Backend API</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      color: #eeeeeef6;
-    }
-    header {
-      background-color: #0055be;
-      color: white;
-      padding: 1rem 0;
-    }
-    main {
-      padding: 2rem;
-    }
-    footer {
-      margin-top: auto;
-      font-size: 0.9rem;
-      color: #666;
-    }
-    .status {
-      font-family: Arial, sans-serif;
-      font-size: 4rem; /* Larger text size */
-      margin-top: 6rem; /* Move it lower */
-    }
-    .status.ok {
-      color: #00ff00; /* Bright green for "running" */
-    }
-    .status.error {
-      color: #ff0000; /* Bright red for "down" */
-    }
-    .uptime {
-      font-family: Arial, sans-serif; /* Normal font for uptime */
-      font-size: 1rem; /* Normal font size */
-      color: #ffffff; /* White text for uptime */
-      margin-top: 1rem; /* Add spacing below the status */
-    }
-  </style>
-  <!-- Link to Google Fonts for retro style -->
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="/assets/styles.css">
+  <!-- Link to Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -62,55 +24,6 @@
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
-  <script>
-    async function fetchHealthStatus() {
-      try {
-        const response = await fetch('/api/health');
-        if (!response.ok) throw new Error('Server returned an error');
-        const health = await response.json();
-  
-        const healthStatus = document.getElementById('healthStatus');
-        const uptimeElement = document.getElementById('uptime');
-  
-        if (health.status === 'Server is running') {
-          healthStatus.textContent = "Server is running";
-          healthStatus.classList.remove('error');
-          healthStatus.classList.add('ok');
-  
-          // Display total uptime
-          if (health.uptime) {
-            const totalUptimeInSeconds = Math.floor(health.uptime);
-            const diffInMinutes = Math.floor(totalUptimeInSeconds / 60);
-            const diffInHours = Math.floor(diffInMinutes / 60);
-            const diffInDays = Math.floor(diffInHours / 24);
-            const diffInWeeks = Math.floor(diffInDays / 7);
-  
-            const uptimeMessage = `Total Uptime: ${diffInWeeks}w ${diffInDays % 7}d ${diffInHours % 24}h ${diffInMinutes % 60}m ${totalUptimeInSeconds % 60}s`;
-            uptimeElement.textContent = uptimeMessage;
-          } else {
-            uptimeElement.textContent = ""; // Clear uptime if not available
-          }
-        } else {
-          healthStatus.textContent = "Server is down";
-          healthStatus.classList.remove('ok');
-          healthStatus.classList.add('error');
-          uptimeElement.textContent = ""; // Clear uptime when server is down
-        }
-      } catch (error) {
-        const healthStatus = document.getElementById('healthStatus');
-        const uptimeElement = document.getElementById('uptime');
-        healthStatus.textContent = "Server is down";
-        healthStatus.classList.remove('ok');
-        healthStatus.classList.add('error');
-        uptimeElement.textContent = ""; // Clear uptime on error
-      }
-    }
-  
-    // Delay the initial health check by 3 seconds after the page loads
-    setTimeout(() => {
-      fetchHealthStatus();
-      setInterval(fetchHealthStatus, 1000); // Check health status every second
-    }, 3000);
-  </script>
+  <script src="/features/fetchHealthStatus.js"></script>
 </body>
 </html>
