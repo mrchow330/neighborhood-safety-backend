@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Map Tester</title>
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+      margin-top: 20px;
+    }
+  </style>
+  <!-- Include Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <header>
+    <h1>API Map Tester</h1>
+  </header>
+  <main>
+    <p>Use this page to test the map functionality and view nearby reports.</p>
+    <div id="map"></div>
+  </main>
+  <!-- Include Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map
+    const map = L.map('map').setView([40.69791631540417, -89.61528500260673], 17); // Default to Bradley University
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    // Fetch nearby reports and add markers
+    async function fetchNearbyReports(latitude, longitude) {
+      const response = await fetch(`/near?latitude=${latitude}&longitude=${longitude}&maxDistance=5000`);
+      const reports = await response.json();
+
+      reports.forEach(report => {
+        const [lng, lat] = report.location.coordinates;
+        L.marker([lat, lng]).addTo(map).bindPopup(`<b>${report.issueType}</b><br>${report.description}`);
+      });
+    }
+
+    // Example: Fetch reports near a specific location
+    fetchNearbyReports(40.69791631540417, -89.61528500260673); // This is the Bradley University Library
+  </script>
+</body>
+</html>
