@@ -24,8 +24,8 @@ app.get('/', (req, res) => {
 
 // API routes
 app.use('/api/reports', require('./api/reports'));
-// app.use('/api/users', require('./api/users'));
-// app.use('/api/health', require('./api/health'));
+app.use('/api/users', require('./api/users'));
+app.use('/api/health', require('./api/health'));
 
 // Export for Vercel
 module.exports = app;
