@@ -77,7 +77,9 @@ app.get('/api-user-tester.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'api-user-tester.html'));
 });
 
-
+app.get('/api-map-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-map-tester.html'));
+});
 
 
 // Variable to track the last time the server was "running"
