@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // API routes
-app.use('/api/reports', require('/api/reports'));
+app.use('/api/reports', require('./api/reports'));
 // app.use('/api/users', require('./api/users'));
 // app.use('/api/health', require('./api/health'));
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Assuming you move the User schema to a separate file
+const User = require('../schemas/User'); // Updated path to the User schema
 
 // API Route to Create a User Account
 router.post('/', async (req, res) => {

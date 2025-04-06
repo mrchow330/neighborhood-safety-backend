@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Report = require('../models/Report'); // Assuming you move the Report schema to a separate file
+const Report = require('../schemas/Report'); 
 
 // API Route to Submit Reports
 router.post('/', async (req, res) => {
@@ -9,6 +9,7 @@ router.post('/', async (req, res) => {
     await report.save();
     res.status(201).json({ message: 'Report submitted successfully', report });
   } catch (err) {
+    console.error('Error saving report:', err.message); // Log the error for debugging
     res.status(500).json({ error: 'Failed to submit report' });
   }
 });
