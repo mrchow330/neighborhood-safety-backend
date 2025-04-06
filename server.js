@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
-  email: { type: String, unique: true, sparse: true },
+  email: { type: String},
   phone_number: { type: String },
   password: { type: String, required: true }, // Will hash passwords in the future
   isModerator: { type: Boolean, default: false },
@@ -44,7 +44,6 @@ userSchema.pre('validate', function (next) {
     next();
   }
 });
-
 
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
@@ -93,8 +92,7 @@ app.get('/api/health', async (req, res) => {
     res.status(200).json({
       status: statusMessage,
       database: isRunning ? 'Connected' : 'Disconnected',
-      uptime: process.uptime(),
-      lastUpTime: lastUpTime ? lastUpTime.toISOString() : null, // Include the last "up" time
+      uptime: process.uptime(), // Total uptime since the server started
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
@@ -133,15 +131,19 @@ app.post('/api/users', async (req, res) => {
     }
 
     // Create a new user
-    const user = new User({ first_name, last_name, username, email, phone_number, password });
+    const user = new User({ first_name, last_name, username, email: email || null, phone_number: phone_number || null, password });
     await user.save();
 
     res.status(201).json({ message: 'User account created successfully', user });
   } catch (err) {
     if (err.code === 11000) {
-      // Handle duplicate key error (e.g., username, email, or phone_number already exists)
-      return res.status(400).json({ error: 'Username, email, or phone number already exists' });
+      // Log the entire error to the console
+      console.error('Duplicate key error:', err);
+
+      // Handle duplicate key error
+      return res.status(400).json({ error: 'Username or email already exists' });
     }
+    console.error('Error creating user:', err); // Log other errors
     res.status(500).json({ error: 'Failed to create user account' });
   }
 });
