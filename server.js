@@ -17,12 +17,18 @@ mongoose.connect(process.env.MONGO_URI, {
 const reportSchema = new mongoose.Schema({
   report_id: { type: String, required: true },
   issueType: String,
-  location: String,
+  location: { 
+    type: { type: String, enum: ['Point'], required: true }, // GeoJSON type
+    coordinates: { type: [Number], required: true }, // [longitude, latitude]
+  },
   description: String,
   photoUri: String,
   createdAt: { type: Date, default: Date.now },
   status: { type: String, default: "Submitted" }, 
 });
+
+// A geospatial index on the location field
+reportSchema.index({ location: '2dsphere' });
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -57,6 +63,7 @@ try {
 
 const path = require('path');
 
+
 // Serve a simple HTML page for the root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -70,8 +77,12 @@ app.get('/api-user-tester.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'api-user-tester.html'));
 });
 
+
+
+
 // Variable to track the last time the server was "running"
 let lastUpTime = null;
+
 
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {
@@ -107,13 +118,59 @@ app.get('/api/health', async (req, res) => {
 // API Route to Submit Reports
 app.post('/api/reports', async (req, res) => {
   try {
-    const report = new Report(req.body);
+    const { report_id, issueType, latitude, longitude, description, photoUri } = req.body;
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: 'Latitude and longitude are required' });
+    }
+
+    const report = new Report({
+      report_id,
+      issueType,
+      location: {
+        type: 'Point',
+        coordinates: [longitude, latitude], // GeoJSON format: [longitude, latitude]
+      },
+      description,
+      photoUri,
+    });
+
     await report.save();
     res.status(201).json({ message: 'Report submitted successfully', report });
   } catch (err) {
+    console.error('Error saving report:', err.message);
     res.status(500).json({ error: 'Failed to submit report' });
   }
 });
+
+
+// API Route to fetch nearby location
+app.get('/near', async (req, res) => {
+  try {
+    const { latitude, longitude, maxDistance = 5000 } = req.query; // maxDistance in meters
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: 'Latitude and longitude are required' });
+    }
+
+    const reports = await Report.aggregate([
+      {
+        $geoNear: {
+          near: { type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] },
+          distanceField: 'distance', // Adds a "distance" field to each result
+          maxDistance: parseInt(maxDistance), // Maximum distance in meters
+          spherical: true,
+        },
+      },
+    ]);
+
+    res.status(200).json(reports);
+  } catch (err) {
+    console.error('Error fetching nearby reports:', err.message);
+    res.status(500).json({ error: 'Failed to fetch nearby reports' });
+  }
+});
+
 
 // API Route to Create a User Account
 app.post('/api/users', async (req, res) => {
@@ -147,6 +204,7 @@ app.post('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Failed to create user account' });
   }
 });
+
 
 // Export for Vercel
 module.exports = app;
