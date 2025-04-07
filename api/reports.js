@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Report = require('../schemas/Report'); // Import the Report model
+const Report = require('../schemas/Report'); // Import the Report schema
 
 // POST /api/reports - Create a new report
 router.post('/', async (req, res) => {
