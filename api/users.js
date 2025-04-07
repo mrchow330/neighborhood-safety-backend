@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Report = require('../schemas/User'); // Import the User schema
+const User = require('../schemas/User'); // Import the User schema
 
 // POST /api/users - Create a new user
 router.post('/', async (req, res) => {
