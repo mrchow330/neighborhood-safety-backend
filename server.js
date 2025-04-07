@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -12,24 +13,6 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-// Report Schema
-const reportSchema = new mongoose.Schema({
-  report_id: { type: String, required: true },
-  issueType: String,
-  location: {type: String, required: true},
-  // location: { 
-  //   type: { type: String, enum: ['Point'], required: false }, // GeoJSON type
-  //   coordinates: { type: [Number], required: false }, // [longitude, latitude]
-  // },
-  description: String,
-  photoUri: String,
-  createdAt: { type: Date, default: Date.now },
-  status: { type: String, default: "Submitted" }, 
-});
-
-// A geospatial index on the location field
-reportSchema.index({ location: '2dsphere' });
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -52,8 +35,6 @@ userSchema.pre('validate', function (next) {
   }
 });
 
-const Report = mongoose.model('Report', reportSchema, 'reports');
-
 const User = mongoose.model('User', userSchema, 'users');
 
 try {
@@ -61,8 +42,6 @@ try {
 } catch (err) {
   console.error('Error setting up static middleware:', err);
 }
-
-const path = require('path');
 
 
 // Serve a simple HTML page for the root route
@@ -118,35 +97,10 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// API Route to Submit Reports
-app.post('/api/reports', async (req, res) => {
-  try {
-    const { report_id, issueType, location, description, photoUri } = req.body;
-    // const { report_id, issueType, latitude, longitude, description, photoUri } = req.body;
+// API Route to Create a Report
+const reportsRoute = require('./api/reports');
 
-    // if (!latitude || !longitude) {
-    //   return res.status(400).json({ error: 'Latitude and longitude are required' });
-    // }
-
-    const report = new Report({
-      report_id,
-      issueType,
-      location,
-      // location: {
-      //   type: 'Point',
-      //   coordinates: [longitude, latitude], // GeoJSON format: [longitude, latitude]
-      // },
-      description,
-      photoUri,
-    });
-
-    await report.save();
-    res.status(201).json({ message: 'Report submitted successfully', report });
-  } catch (err) {
-    console.error('Error saving report:', err.message);
-    res.status(500).json({ error: 'Failed to submit report' });
-  }
-});
+app.use('/api/reports', reportsRoute);
 
 
 // API Route to fetch nearby location
