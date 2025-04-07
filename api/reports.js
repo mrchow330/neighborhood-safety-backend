@@ -1,5 +1,4 @@
 const express = require('express');
-const Report = require('../models/Report'); // Import Report model
 
 const router = express.Router();
 
