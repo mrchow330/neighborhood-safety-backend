@@ -16,24 +16,11 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 
 // User Schema
-const userSchema = new mongoose.Schema({
-  first_name: { type: String, required: true },
-  last_name: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  phone_number: { type: String, required: true },
-  password: { type: String, required: true }, // Will hash passwords in the future
-  isModerator: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-});
+const User = require('./schemas/User');
 
-const User = mongoose.model('User', userSchema, 'users');
 
-try {
-  app.use('/features', express.static(path.join(__dirname, 'features')));
-} catch (err) {
-  console.error('Error setting up static middleware:', err);
-}
+// Serve static files
+app.use('/features', express.static(path.join(__dirname, 'features')));
 
 
 // Serve a simple HTML page for the root route
