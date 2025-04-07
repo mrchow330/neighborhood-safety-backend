@@ -42,8 +42,8 @@ app.get('/api-map-tester.html', (req, res) => {
 
 
 // Variable to track the last time the server was "running"
-let lastUpTime = null;
-
+let totalUptime = 0;
+let lastCheckedTime = null;
 
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {
@@ -54,18 +54,20 @@ app.get('/api/health', async (req, res) => {
     const isRunning = dbState === 1;
     const statusMessage = isRunning ? 'Server is running' : 'Server is down';
 
-    // Update the lastUpTime if the server is running
-    if (isRunning && !lastUpTime) {
-      lastUpTime = new Date(); // Set the last "up" time
-    } else if (!isRunning) {
-      lastUpTime = null; // Reset the last "up" time if the server is down
+    // Update the total uptime if the server is running
+    const currentTime = new Date();
+    if (isRunning) {
+      if (lastCheckedTime) {
+        totalUptime += (currentTime - lastCheckedTime) / 1000; // Add elapsed time in seconds
+      }
     }
+    lastCheckedTime = currentTime;
 
     res.status(200).json({
       status: statusMessage,
       database: isRunning ? 'Connected' : 'Disconnected',
-      uptime: process.uptime(), // Total uptime since the server started
-      timestamp: new Date().toISOString(),
+      uptime: totalUptime, // Total uptime in seconds
+      timestamp: currentTime.toISOString(),
     });
   } catch (err) {
     res.status(500).json({
