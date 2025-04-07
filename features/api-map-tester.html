@@ -33,6 +33,39 @@
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 
+    // Marker for the user's location
+    let userMarker = null;
+
+    // Function to update the user's location
+    function updateUserLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // If the marker already exists, update its position
+            if (userMarker) {
+              userMarker.setLatLng([latitude, longitude]);
+            } else {
+              // Create a new marker for the user's location
+              userMarker = L.marker([latitude, longitude], { title: "Your Location" })
+                .addTo(map)
+                .bindPopup("You are here")
+                .openPopup();
+            }
+
+            // Center the map on the user's location
+            map.setView([latitude, longitude], 17);
+          },
+          (error) => {
+            console.error("Error getting user location:", error);
+          }
+        );
+      } else {
+        console.error("Geolocation is not supported by this browser.");
+      }
+    }
+
     // Fetch nearby reports and add markers
     async function fetchNearbyReports(latitude, longitude) {
       const response = await fetch(`/near?latitude=${latitude}&longitude=${longitude}&maxDistance=5000`);
@@ -44,8 +77,11 @@
       });
     }
 
-    // Example: Fetch reports near a specific location
-    fetchNearbyReports(40.69791631540417, -89.61528500260673); // This is the Bradley University Library
+    // Update the user's location every second
+    setInterval(updateUserLocation, 1000);
+
+    // Example: Fetch reports near a specific location (Bradley University Library)
+    fetchNearbyReports(40.69791631540417, -89.61528500260673);
   </script>
 </body>
 </html>
