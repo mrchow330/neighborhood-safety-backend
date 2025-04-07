@@ -18,8 +18,8 @@ const reportSchema = new mongoose.Schema({
   report_id: { type: String, required: true },
   issueType: String,
   location: { 
-    type: { type: String, enum: ['Point'], required: true }, // GeoJSON type
-    coordinates: { type: [Number], required: true }, // [longitude, latitude]
+    type: { type: String, enum: ['Point'], required: false }, // GeoJSON type
+    coordinates: { type: [Number], required: false }, // [longitude, latitude]
   },
   description: String,
   photoUri: String,
