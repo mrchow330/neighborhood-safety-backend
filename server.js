@@ -26,15 +26,6 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-// Custom validation to ensure at least one of `email` or `phone_number` is provided
-userSchema.pre('validate', function (next) {
-  if (!this.email && !this.phone_number) {
-    next(new Error('A user must have either an email or a phone number.'));
-  } else {
-    next();
-  }
-});
-
 const User = mongoose.model('User', userSchema, 'users');
 
 try {
