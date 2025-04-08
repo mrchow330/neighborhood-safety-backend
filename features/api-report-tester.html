@@ -41,6 +41,11 @@
     button:hover {
       background-color: #45a049;
     }
+    #locationInfo {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
   </style>
 </head>
 <body>
@@ -51,7 +56,7 @@
     <p>Use this form to test the API by submitting a safety report.</p>
     <form id="reportForm">
       <input type="text" name="issueType" placeholder="Issue Type" required />
-      <button id="getLocationButton">Get My Location</button>
+      <button id="getLocationButton" type="button">Get My Location</button>
       <textarea name="description" placeholder="Description"></textarea>
       <button type="submit">Submit Report</button>
     </form>
@@ -65,6 +70,7 @@
     // Add event listener for the "Get My Location" button
     document.getElementById('getLocationButton').addEventListener('click', () => {
       const locationInfo = document.getElementById('locationInfo');
+      event.preventDefault();
 
       if (!navigator.geolocation) {
         locationInfo.textContent = 'Geolocation is not supported by your browser.';
