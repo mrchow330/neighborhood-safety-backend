@@ -41,6 +41,11 @@
     button:hover {
       background-color: #45a049;
     }
+    #locationInfo {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
   </style>
 </head>
 <body>
@@ -49,53 +54,96 @@
   </header>
   <main>
     <p>Use this form to test the API by submitting a safety report.</p>
+    <button id="getLocationButton" type="button">Get My Location</button>
     <form id="reportForm">
       <input type="text" name="issueType" placeholder="Issue Type" required />
-      <input type="text" name="location" placeholder="Location" required />
       <textarea name="description" placeholder="Description"></textarea>
       <button type="submit">Submit Report</button>
     </form>
+    <p id="locationInfo"></p>
     <p id="responseMessage"></p>
   </main>
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
   <script>
+    // Add event listener for the "Get My Location" button
+    document.getElementById('getLocationButton').addEventListener('click', () => {
+      const locationInfo = document.getElementById('locationInfo');
+      event.preventDefault();
+
+      if (!navigator.geolocation) {
+        locationInfo.textContent = 'Geolocation is not supported by your browser.';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          locationInfo.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          locationInfo.textContent = 'Unable to retrieve your location.';
+        }
+      );
+    });
+
+    // Add event listener for the report submission form
     document.getElementById('reportForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-  
+
       // Generate a unique report ID (e.g., using a timestamp)
       const reportId = `report_${Date.now()}`;
-  
+
       // Collect form data
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
-  
-      // Construct the reportData object
-      const reportData = {
-        report_id: reportId, // Unique report ID
-        issueType: data.issueType,
-        location: data.location,
-        description: data.description,
-        photoUri: "", // Placeholder for now (e.g., if no photo is uploaded)
-      };
-  
-      // Send the reportData to the API
-      try {
-        const response = await fetch('/api/reports', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reportData),
-        });
-  
-        const result = await response.json();
+
+      // Get the user's location
+      if (!navigator.geolocation) {
         document.getElementById('responseMessage').textContent =
-          result.message || 'Error submitting report';
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('responseMessage').textContent =
-          'An unexpected error occurred';
+          'Geolocation is not supported by your browser.';
+        return;
       }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Construct the reportData object
+          const reportData = {
+            report_id: reportId, // Unique report ID
+            issueType: data.issueType,
+            latitude, // User's latitude
+            longitude, // User's longitude
+            description: data.description,
+            photoUri: "", // Placeholder for now (e.g., if no photo is uploaded)
+          };
+
+          // Send the reportData to the API
+          try {
+            const response = await fetch('/api/reports', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(reportData),
+            });
+
+            const result = await response.json();
+            document.getElementById('responseMessage').textContent =
+              result.message || 'Error submitting report';
+          } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('responseMessage').textContent =
+              'An unexpected error occurred';
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          document.getElementById('responseMessage').textContent =
+            'Unable to retrieve your location.';
+        }
+      );
     });
   </script>
 </body>
