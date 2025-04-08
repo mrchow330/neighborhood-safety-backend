@@ -51,10 +51,10 @@
     <p>Use this form to test the API by submitting a safety report.</p>
     <form id="reportForm">
       <input type="text" name="issueType" placeholder="Issue Type" required />
+      <button id="getLocationButton">Get My Location</button>
       <textarea name="description" placeholder="Description"></textarea>
       <button type="submit">Submit Report</button>
     </form>
-    <button id="getLocationButton">Get My Location</button>
     <p id="locationInfo"></p>
     <p id="responseMessage"></p>
   </main>
@@ -74,7 +74,7 @@
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          locationInfo.textContent = `Your Location: Latitude ${latitude}, Longitude ${longitude}`;
+          locationInfo.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
         },
         (error) => {
           console.error('Error getting location:', error);
