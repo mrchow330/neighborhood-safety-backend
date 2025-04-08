@@ -71,31 +71,50 @@
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
   
+
+      // Get the user's location
+      if (!navigator.geolocation) {
+        document.getElementById('responseMessage').textContent =
+          'Geolocation is not supported by your browser.';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
       // Construct the reportData object
       const reportData = {
         report_id: reportId, // Unique report ID
         issueType: data.issueType,
-        location: data.location,
+        latitude, // User's latitude
+        longitude, // User's longitude
         description: data.description,
         photoUri: "", // Placeholder for now (e.g., if no photo is uploaded)
       };
   
-      // Send the reportData to the API
       try {
-        const response = await fetch('/api/reports', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reportData),
-        });
-  
-        const result = await response.json();
-        document.getElementById('responseMessage').textContent =
-          result.message || 'Error submitting report';
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('responseMessage').textContent =
-          'An unexpected error occurred';
-      }
+            const response = await fetch('/api/reports', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(reportData),
+            });
+
+            const result = await response.json();
+            document.getElementById('responseMessage').textContent =
+              result.message || 'Error submitting report';
+          } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('responseMessage').textContent =
+              'An unexpected error occurred';
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          document.getElementById('responseMessage').textContent =
+            'Unable to retrieve your location.';
+        }
+      );
     });
   </script>
 </body>
