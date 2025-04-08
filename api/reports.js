@@ -5,7 +5,7 @@ const Report = require('../schemas/Report'); // Import the Report schema
 // POST /api/reports - Create a new report
 router.post('/', async (req, res) => {
   try {
-    const { report_id, issueType, latitude, longitude, description, photoUri } = req.body;
+    const { report_id, issueType, longitude, latitude, description, photoUri } = req.body;
 
     if (!latitude || !longitude) {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
