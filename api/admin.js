@@ -44,4 +44,28 @@ router.get('/users', async (req, res) => {
     }
 });
 
+// PATCH /api/admin/users/:id/toggle-moderator - Toggle isModerator status
+router.patch('/users/:id/toggle-moderator', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isModerator } = req.body;
+  
+      // Update the user's isModerator status
+      const user = await User.findByIdAndUpdate(
+        id,
+        { isModerator },
+        { new: true } // Return the updated document
+      );
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      res.status(200).json({ message: `User's moderator status updated successfully` });
+    } catch (err) {
+      console.error('Error updating moderator status:', err);
+      res.status(500).json({ error: 'Failed to update moderator status' });
+    }
+}); 
+
 module.exports = router;
