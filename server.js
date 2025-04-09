@@ -40,6 +40,13 @@ app.get('/api-map-tester.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'api-map-tester.html'));
 });
 
+app.get('/admin-login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'admin-login.html'));
+});
+
+app.get('/admin-dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'admin-dashboard.html'));
+});
 
 // Variable to track the last time the server was "running"
 let totalUptime = 0;
