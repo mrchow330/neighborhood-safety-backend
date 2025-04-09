@@ -116,5 +116,10 @@ app.get('/near', async (req, res) => {
 });
 
 
+// API Route to admin login
+const adminRoute = require('./api/admin'); // Import the admin route
+app.use('/api/admin', adminRoute); // Use the admin route
+
+
 // Export for Vercel
 module.exports = app;
