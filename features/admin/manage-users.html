@@ -60,6 +60,22 @@
       padding: 0.5rem 0;
       font-size: 0.9rem;
     }
+    /* Popup notification styles */
+    #popupMessage {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+    }
+    #popupMessage.error {
+      background-color: #f44336; /* Red for errors */
+    }
   </style>
 </head>
 <body>
@@ -88,6 +104,10 @@
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
+
+  <!-- Popup notification -->
+  <div id="popupMessage"></div>
+
   <script>
     async function fetchUsers() {
       try {
@@ -130,14 +150,26 @@
 
         if (!response.ok) throw new Error('Failed to update moderator status');
         const result = await response.json();
-        alert(result.message);
+        showPopup(result.message, false); // Show success popup
 
         // Refresh the user list
         fetchUsers();
       } catch (error) {
         console.error('Error updating moderator status:', error);
-        alert('An error occurred while updating moderator status.');
+        showPopup('An error occurred while updating moderator status.', true); // Show error popup
       }
+    }
+
+    function showPopup(message, isError) {
+      const popup = document.getElementById('popupMessage');
+      popup.textContent = message;
+      popup.className = isError ? 'error' : ''; // Add "error" class for errors
+      popup.style.display = 'block';
+
+      // Hide the popup after 3 seconds
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 3000);
     }
 
     // Fetch users when the page loads
