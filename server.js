@@ -48,11 +48,11 @@ app.get('/admin-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'admin', 'admin-dashboard.html'));
 });
 
-app.get('/admin/manage-users.html', (req, res) => {
+app.get('/manage-users.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'admin', 'manage-users.html'));
 });
 
-app.get('/admin/manage-reports.html', (req, res) => {
+app.get('/manage-reports.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'features', 'admin', 'manage-reports.html'));
 });
 
