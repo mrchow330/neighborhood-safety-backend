@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem 0;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+  </header>
+  <main>
+    <h2>List of Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Is Moderator</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- User rows will be dynamically added here -->
+      </tbody>
+    </table>
+  </main>
+  <footer>
+    <p>&copy; 2025 Team Prodigies</p>
+  </footer>
+  <script>
+    async function fetchUsers() {
+      try {
+        const response = await fetch('/api/admin/users');
+        if (!response.ok) throw new Error('Failed to fetch users');
+        const users = await response.json();
+
+        const userTableBody = document.getElementById('userTableBody');
+        userTableBody.innerHTML = ''; // Clear existing rows
+
+        users.forEach(user => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${user.first_name}</td>
+            <td>${user.last_name}</td>
+            <td>${user.username}</td>
+            <td>${user.email}</td>
+            <td>${user.phone_number}</td>
+            <td>${user.isModerator ? 'Yes' : 'No'}</td>
+            <td>${new Date(user.createdAt).toLocaleString()}</td>
+          `;
+          userTableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    }
+
+    // Fetch users when the page loads
+    fetchUsers();
+  </script>
+</body>
+</html>

@@ -32,4 +32,16 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET /api/admin/users - Get all users
+router.get('/users', async (req, res) => {
+    try {
+      // Fetch all users, excluding the password field
+      const users = await User.find({}, '-password'); // Exclude the password field
+      res.status(200).json(users);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      res.status(500).json({ error: 'Failed to fetch users' });
+    }
+});
+
 module.exports = router;
