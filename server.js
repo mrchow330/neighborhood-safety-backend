@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
+mongoose.set('strictQuery', true);
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -13,38 +15,35 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-// Define the Report Schema
-const reportSchema = new mongoose.Schema({
-  report_id: { type: String, required: true },
-  issueType: String,
-  location: String,
-  description: String,
-  photoUri: String,
-  createdAt: { type: Date, default: Date.now },
-  status: { type: String, default: "Submitted" }, 
-});
+// User Schema
+const User = require('./schemas/User');
 
-const Report = mongoose.model('Report', reportSchema, 'reports');
 
-try {
-  app.use('/features', express.static(path.join(__dirname, 'features')));
-} catch (err) {
-  console.error('Error setting up static middleware:', err);
-}
+// Serve static files
+app.use('/features', express.static(path.join(__dirname, 'features')));
 
-const path = require('path');
 
 // Serve a simple HTML page for the root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/api-tester.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'features', 'api-tester.html'));
+app.get('/api-report-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-report-tester.html'));
 });
 
+app.get('/api-user-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-user-tester.html'));
+});
+
+app.get('/api-map-tester.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'api-map-tester.html'));
+});
+
+
 // Variable to track the last time the server was "running"
-let lastUpTime = null;
+let totalUptime = 0;
+let lastCheckedTime = null;
 
 // Health Check Endpoint
 app.get('/api/health', async (req, res) => {
@@ -55,19 +54,20 @@ app.get('/api/health', async (req, res) => {
     const isRunning = dbState === 1;
     const statusMessage = isRunning ? 'Server is running' : 'Server is down';
 
-    // Update the lastUpTime if the server is running
-    if (isRunning && !lastUpTime) {
-      lastUpTime = new Date(); // Set the last "up" time
-    } else if (!isRunning) {
-      lastUpTime = null; // Reset the last "up" time if the server is down
+    // Update the total uptime if the server is running
+    const currentTime = new Date();
+    if (isRunning) {
+      if (lastCheckedTime) {
+        totalUptime += (currentTime - lastCheckedTime) / 1000; // Add elapsed time in seconds
+      }
     }
+    lastCheckedTime = currentTime;
 
     res.status(200).json({
       status: statusMessage,
       database: isRunning ? 'Connected' : 'Disconnected',
-      uptime: process.uptime(),
-      lastUpTime: lastUpTime ? lastUpTime.toISOString() : null, // Include the last "up" time
-      timestamp: new Date().toISOString(),
+      uptime: totalUptime, // Total uptime in seconds
+      timestamp: currentTime.toISOString(),
     });
   } catch (err) {
     res.status(500).json({
@@ -78,14 +78,40 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// API Route to Submit Reports
-app.post('/api/reports', async (req, res) => {
+// API Route to Create a Report
+const reportsRoute = require('./api/reports');
+app.use('/api/reports', reportsRoute);
+
+
+// API Route to Create a User
+const usersRoute = require('./api/users');
+app.use('/api/users', usersRoute);
+
+
+// API Route to fetch nearby location
+app.get('/near', async (req, res) => {
   try {
-    const report = new Report(req.body);
-    await report.save();
-    res.status(201).json({ message: 'Report submitted successfully', report });
+    const { latitude, longitude, maxDistance = 5000 } = req.query; // maxDistance in meters
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: 'Latitude and longitude are required' });
+    }
+
+    const reports = await Report.aggregate([
+      {
+        $geoNear: {
+          near: { type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] },
+          distanceField: 'distance', // Adds a "distance" field to each result
+          maxDistance: parseInt(maxDistance), // Maximum distance in meters
+          spherical: true,
+        },
+      },
+    ]);
+
+    res.status(200).json(reports);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to submit report' });
+    console.error('Error fetching nearby reports:', err.message);
+    res.status(500).json({ error: 'Failed to fetch nearby reports' });
   }
 });
 

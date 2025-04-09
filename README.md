@@ -2,10 +2,24 @@
 
 This repository contains the backend API for the Neighborhood Safety App. The backend is built using Node.js and Express.js and is responsible for handling user-submitted safety reports, storing them in a MongoDB database, and providing endpoints for interacting with the data. This API acts as a server to create the main connection and communication between the app and our MongoDB database remotely.
 
+## Dependencies
+
+The following dependencies are required to run this project:
+
+- **Required**:
+  - `express`: For building the server and handling API routes.
+  - `mongoose`: For connecting to and interacting with the MongoDB database.
+  - `dotenv`: For managing environment variables securely.
+  - `cors`: For enabling cross-origin resource sharing.
+
+- **Optional**:
+  - `nodemon`: For automatically restarting the server during development when file changes are detected.
+
 ## Features
 
 - **Submit Reports**: User reports can be submitted to our database using this server.
 - **Database Integration**: Reports are stored in a MongoDB database for persistence.
+- **Geolocation Support**: Geolocation API integration can be seen here.
 - **API Endpoints**: Provides RESTful API endpoints for submitting and managing reports.
 - **Health Check**: A `/api/health` endpoint provides real-time server status, including database connection status and uptime tracking.
 - **Frontend Integration**: Displays server status and uptime on the frontend, with real-time updates (if need be).
@@ -16,6 +30,8 @@ This repository contains the backend API for the Neighborhood Safety App. The ba
 - `/features`: All the features I implemented because I'm bored
    - `/health.html`: A frontend page that displays the server's health status and uptime, updating every second (displayed in index.html)
    - `/api-tester.html`: A frontend page to test report submission (kind of unecessary but whatever)
+   - `/api-user-tester.html`: A frontend page to test user-related APIs.
+   - `/api-map-tester.html`: A frontend page to test mapping API.
 - `api/reports.js`: Contains the route for handling report submissions.
 - `vercel.json`: Configuration for deploying the backend on Vercel.
 
@@ -32,14 +48,12 @@ This repository contains the backend API for the Neighborhood Safety App. The ba
    npm install
    ```
 
-   The following dependencies must be installed:
+   Dependencies to install:
    - `express`
    - `mongoose`
    - `dotenv`
    - `cors`
-
-   The following dependenceies are optional:
-   - `nodemon`: A tool that automatically restarts the server when file changes are detected during development.
+   - `nodemon` (optional)
 
 
 3. Set up environment variables:
@@ -107,14 +121,13 @@ This repository contains the backend API for the Neighborhood Safety App. The ba
 
 - **Health Status Display**: The `features/health.html` page displays the server's health status (`Server is running` or `Server is down`) and uptime in a user-friendly format.
 - **Real-Time Updates**: The health status and uptime are updated every second using JavaScript.
+-**Map Visualization**: The `api-map-tester.html` page displays a map using Leaflet.
 
 ## Deployment
 
 This backend can be deployed on platforms like Vercel. Ensure that the `vercel.json` file is properly configured for deployment. When deploying with Vercel, there are two methods.
 
 ### Deployment on Vercel (Locally)
-
-To deploy this backend on Vercel, follow these steps:
 
 1. **Create a Vercel Account**
    - If you haven't created an account, create an account on https://vercel.com.

@@ -54,7 +54,9 @@
   <main>
     <p>This is the backend service for HoodWatch (name WIP).</p>
     <p>Use the API endpoints to interact with the system.</p>
-    <p><a href="/api-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Tester</a></p>
+    <p><a href="/api-report-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Report Tester</a></p>
+    <p><a href="/api-user-tester.html" style="color: #0073ff; text-decoration: none;">Go to API User Tester</a></p>
+    <p><a href="/api-map-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Map Tester</a></p>
     <div id="healthStatus" class="status">Checking API health...</div>
     <div id="uptime" class="uptime"></div> <!-- Uptime text -->
   </main>
@@ -67,35 +69,32 @@
         const response = await fetch('/api/health');
         if (!response.ok) throw new Error('Server returned an error');
         const health = await response.json();
-
+  
         const healthStatus = document.getElementById('healthStatus');
         const uptimeElement = document.getElementById('uptime');
-
+  
         if (health.status === 'Server is running') {
           healthStatus.textContent = "Server is running";
           healthStatus.classList.remove('error');
           healthStatus.classList.add('ok');
-
-          // Display uptime
-          if (health.lastUpTime) {
-            const lastUpTime = new Date(health.lastUpTime);
-            const now = new Date();
-            const diffInSeconds = Math.floor((now - lastUpTime) / 1000);
-            const diffInMinutes = Math.floor(diffInSeconds / 60);
-            const diffInHours = Math.floor(diffInMinutes / 60);
-            const diffInDays = Math.floor(diffInHours / 24);
-            const diffInWeeks = Math.floor(diffInDays / 7);
-
-            const uptimeMessage = `Uptime: ${diffInWeeks}w ${diffInDays % 7}d ${diffInHours % 24}h ${diffInMinutes % 60}m ${diffInSeconds % 60}s`;
-            uptimeElement.textContent = uptimeMessage;
-          } else {
-            uptimeElement.textContent = ""; // Clear uptime if not available
-          }
         } else {
           healthStatus.textContent = "Server is down";
           healthStatus.classList.remove('ok');
           healthStatus.classList.add('error');
-          uptimeElement.textContent = ""; // Clear uptime when server is down
+        }
+
+        // Display total uptime regardless of server status
+        if (health.uptime) {
+          const totalUptimeInSeconds = Math.floor(health.uptime);
+          const diffInMinutes = Math.floor(totalUptimeInSeconds / 60);
+          const diffInHours = Math.floor(diffInMinutes / 60);
+          const diffInDays = Math.floor(diffInHours / 24);
+          const diffInWeeks = Math.floor(diffInDays / 7);
+
+          const uptimeMessage = `Total Uptime: ${diffInWeeks}w ${diffInDays % 7}d ${diffInHours % 24}h ${diffInMinutes % 60}m ${totalUptimeInSeconds % 60}s`;
+          uptimeElement.textContent = uptimeMessage;
+        } else {
+          uptimeElement.textContent = "Uptime data unavailable";
         }
       } catch (error) {
         const healthStatus = document.getElementById('healthStatus');
@@ -103,15 +102,15 @@
         healthStatus.textContent = "Server is down";
         healthStatus.classList.remove('ok');
         healthStatus.classList.add('error');
-        uptimeElement.textContent = ""; // Clear uptime on error
+        uptimeElement.textContent = "Uptime data unavailable"; // Display message when uptime data is unavailable
       }
     }
-
+  
     // Delay the initial health check by 3 seconds after the page loads
-  setTimeout(() => {
-    fetchHealthStatus(); 
-    setInterval(fetchHealthStatus, 1000); // Check health status every second
-  }, 5000); 
+    setTimeout(() => {
+      fetchHealthStatus();
+      setInterval(fetchHealthStatus, 1000); // Check health status every second
+    }, 3000);
   </script>
 </body>
 </html>
