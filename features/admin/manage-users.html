@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+  <title>Manage Users</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -52,30 +52,11 @@
     button:hover {
       background-color: #45a049;
     }
-    #popupMessage {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #4CAF50;
-      color: white;
-      padding: 1rem;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      display: none;
-      z-index: 1000;
-    }
-    #popupMessage.error {
-      background-color: #f44336;
-    }
-    footer {
-      margin-top: auto;
-      font-size: 0.9rem;
-    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Admin Dashboard</h1>
+    <h1>Manage Users</h1>
   </header>
   <main>
     <h2>List of Users</h2>
@@ -88,7 +69,6 @@
           <th>Email</th>
           <th>Phone Number</th>
           <th>Is Moderator</th>
-          <th>Created At</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -100,8 +80,6 @@
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
-  <!-- Popup notification -->
-  <div id="popupMessage"></div>
   <script>
     async function fetchUsers() {
       try {
@@ -121,7 +99,6 @@
             <td>${user.email}</td>
             <td>${user.phone_number}</td>
             <td>${user.isModerator ? 'Yes' : 'No'}</td>
-            <td>${new Date(user.createdAt).toLocaleString()}</td>
             <td>
               <button onclick="toggleModerator('${user._id}', ${user.isModerator})">
                 ${user.isModerator ? 'Revoke Admin' : 'Make Admin'}
@@ -145,26 +122,14 @@
 
         if (!response.ok) throw new Error('Failed to update moderator status');
         const result = await response.json();
-        showPopup(result.message, false); // Show success popup
+        alert(result.message);
 
         // Refresh the user list
         fetchUsers();
       } catch (error) {
         console.error('Error updating moderator status:', error);
-        showPopup('An error occurred while updating moderator status.', true); // Show error popup
+        alert('An error occurred while updating moderator status.');
       }
-    }
-
-    function showPopup(message, isError) {
-      const popup = document.getElementById('popupMessage');
-      popup.textContent = message;
-      popup.className = isError ? 'error' : ''; // Add "error" class for errors
-      popup.style.display = 'block';
-
-      // Hide the popup after 3 seconds
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 3000);
     }
 
     // Fetch users when the page loads

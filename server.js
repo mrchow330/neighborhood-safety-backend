@@ -45,7 +45,15 @@ app.get('/admin-login.html', (req, res) => {
 });
 
 app.get('/admin-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'features', 'admin-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'features', 'admin', 'admin-dashboard.html'));
+});
+
+app.get('/features/admin/manage-users.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'admin', 'manage-users.html'));
+});
+
+app.get('/features/admin/manage-reports.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'features', 'admin', 'manage-reports.html'));
 });
 
 // Variable to track the last time the server was "running"
