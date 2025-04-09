@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../schemas/User'); // Import the User schema
-const bcrypt = require('bcrypt'); // For password hashing (if passwords are hashed)
 
 // POST /api/admin/login - Admin login
 router.post('/login', async (req, res) => {
