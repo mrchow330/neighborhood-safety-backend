@@ -19,10 +19,9 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ error: 'Access denied. Admins only.' });
     }
 
-    // Validate the password (if passwords are hashed)
-    const isPasswordValid = await compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    // Validate the password
+    if (password !== user.password) {
+        return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     // Login successful
