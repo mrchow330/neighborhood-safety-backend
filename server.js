@@ -104,7 +104,7 @@ app.use('/api/users', usersRoute);
 
 // API Route to Google Maps
 const googleMapsProxy = require('./api/google-maps-api');
-app.use('/api/google-maps', googleMapsProxy);
+app.use('/api/google-maps-api', googleMapsProxy);
 
 // API Route to fetch nearby location
 app.get('/near', async (req, res) => {
