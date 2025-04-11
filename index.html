@@ -10,7 +10,7 @@
       text-align: center;
       margin: 0;
       padding: 0;
-      background-color: #000;
+      background-color: #3f3f3f;
       color: #eeeeeef6;
     }
     header {
@@ -22,9 +22,13 @@
       padding: 2rem;
     }
     footer {
-      margin-top: auto;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 0.5rem 0;
       font-size: 0.9rem;
-      color: #666;
+      color: #a9a9a9;
     }
     .status {
       font-family: Arial, sans-serif;
@@ -54,9 +58,16 @@
   <main>
     <p>This is the backend service for HoodWatch (name WIP).</p>
     <p>Use the API endpoints to interact with the system.</p>
-    <p><a href="/api-report-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Report Tester</a></p>
+    <!-- <p><a href="/api-report-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Report Tester</a></p>
     <p><a href="/api-user-tester.html" style="color: #0073ff; text-decoration: none;">Go to API User Tester</a></p>
-    <p><a href="/api-map-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Map Tester</a></p>
+    <p><a href="/api-map-tester.html" style="color: #0073ff; text-decoration: none;">Go to API Map Tester</a></p> -->
+    <p>
+      <button 
+        onclick="window.location.href='/admin-login.html'" 
+        style="font-size: 1.5rem; color: white; background-color: #0073ff; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">
+        Admin Login
+      </button>
+    </p>
     <div id="healthStatus" class="status">Checking API health...</div>
     <div id="uptime" class="uptime"></div> <!-- Uptime text -->
   </main>
@@ -112,5 +123,9 @@
       setInterval(fetchHealthStatus, 1000); // Check health status every second
     }, 3000);
   </script>
+  <script>
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
