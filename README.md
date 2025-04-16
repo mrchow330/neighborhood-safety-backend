@@ -1,6 +1,6 @@
 # Neighborhood Safety Backend
 
-This repository contains the backend API for the Neighborhood Safety App. The backend is built using Node.js and Express.js and is responsible for handling user-submitted safety reports, storing them in a MongoDB database, and providing endpoints for interacting with the data. This API acts as a server to create the main connection and communication between the app and our MongoDB database remotely.
+This repository contains the backend API for the Neighborhood Safety App. The backend is built using Node.js and Express.js and is responsible for handling user-submitted safety reports and user data, storing them in a MongoDB database. This backend server also provides endpoints for interacting with the data. The main goal of this backend website is to act as a server to create the main connection and communication between the app and our MongoDB database remotely. That way, our team can test its functionalities locally without starting a local MongoDB connection as well every time.
 
 ## Dependencies
 
@@ -22,17 +22,23 @@ The following dependencies are required to run this project:
 - **Geolocation Support**: Geolocation API integration can be seen here.
 - **API Endpoints**: Provides RESTful API endpoints for submitting and managing reports.
 - **Health Check**: A `/api/health` endpoint provides real-time server status, including database connection status and uptime tracking.
+- **Admin Dashboard**: A central hub for administrators to manage users and reports.
 - **Frontend Integration**: Displays server status and uptime on the frontend, with real-time updates (if need be).
 
 ## Project Structure
 
 - `server.js`: The main entry point of the application, which sets up the Express server, connects to MongoDB, and handles API routes.
-- `/features`: All the features I implemented because I'm bored
-   - `/health.html`: A frontend page that displays the server's health status and uptime, updating every second (displayed in index.html)
-   - `/api-tester.html`: A frontend page to test report submission (kind of unecessary but whatever)
-   - `/api-user-tester.html`: A frontend page to test user-related APIs.
-   - `/api-map-tester.html`: A frontend page to test mapping API.
+- `/features`: Contains frontend pages for interacting with the backend.
+  - `/admin/`: Contains admin-related pages:
+    - `admin-dashboard.html`: The main admin dashboard with links to manage users and reports.
+    - `manage-users.html`: Allows admins to view and modify user roles (`isModerator`).
+    - `manage-reports.html`: Allows admins to view and delete reports.
+  - `/api-report-tester.html`: A frontend page to test report submission.
+  - `/api-user-tester.html`: A frontend page to test user-related APIs.
+  - `/api-map-tester.html`: A frontend page to test mapping API.
+- `api/admin.js`: Contains routes for admin-related actions, such as managing users and reports.
 - `api/reports.js`: Contains the route for handling report submissions.
+- `schemas/`: Contains Mongoose schemas for the database models.
 - `vercel.json`: Configuration for deploying the backend on Vercel.
 
 ## Installation
@@ -117,8 +123,30 @@ The following dependencies are required to run this project:
   }
   ```
 
+### Admin Endpoints
+- **Fetch User**:
+  - **Endpoint**: `/api/admin/users`
+  - **Method**: `GET`
+  - **Description**: Fetches all users (excluding passwords).
+-**Toggle Moderator Status**: 
+  - **Endpoint**: `/api/admin/users/:id/toggle-moderator`
+  - **Method**: `PATCH`
+  - **Description**: Toggles the `isModerator` status for a user
+- **Fetch Reports**:
+  - **Endpoint**: `/api/admin/reports`
+  - **Method**: `GET`
+  - **Description**: Fetches all reports.
+- **Delete Reports**:
+  - **Endpoint**: `/api/admin/reports/:id`
+  - **Method**: `DELETE`
+  - **Description**: Deletes a specific report.
+
 ## Frontend Features
 
+- **Admin Dashboard**:
+  - `admin-dashboard.html`: Provides links to manage users and reports.
+  - `manage-users.html`: Allows admins to view and modify user roles (`isModerator`)
+  - `manage-reports.html`: Allows admins to view and delete reports.
 - **Health Status Display**: The `features/health.html` page displays the server's health status (`Server is running` or `Server is down`) and uptime in a user-friendly format.
 - **Real-Time Updates**: The health status and uptime are updated every second using JavaScript.
 -**Map Visualization**: The `api-map-tester.html` page displays a map using Leaflet.
