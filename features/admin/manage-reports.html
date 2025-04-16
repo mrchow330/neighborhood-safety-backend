@@ -89,7 +89,7 @@
   <script>
     async function fetchReports() {
       try {
-        const response = await fetch('/api/admin/reports');
+        const response = await fetch('/api/reports');
         if (!response.ok) throw new Error('Failed to fetch reports');
         const reports = await response.json();
 
