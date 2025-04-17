@@ -91,4 +91,36 @@ router.get('/near', async (req, res) => {
   }
 });
 
+// PATCH /api/reports/:id/status - Update the status of a report
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ error: 'Status is required' });
+    }
+
+    const validStatuses = ['Submitted', 'Under Review', 'Reviewed', 'In Progress', 'Resolved'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const updatedReport = await Report.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedReport) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    res.status(200).json({ message: 'Status updated successfully', report: updatedReport });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ error: 'Failed to update status' });
+  }
+});
+
 module.exports = router;
