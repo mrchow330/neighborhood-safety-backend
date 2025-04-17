@@ -16,17 +16,18 @@ router.post('/login', async (req, res) => {
 
     // Find the user by username
     const user = await User.findOne({ username });
-    console.log('Stored Password:', user.password);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     // Compare the provided password with the stored hashed password
     const isPasswordValid = bcrypt.compareSync(password, user.password);
-    console.log('Password Comparison Result:', isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    // Debugging: Log the JWT_SECRET value
+    console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
     // Generate a JWT token
     const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, {
