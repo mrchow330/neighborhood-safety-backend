@@ -52,6 +52,10 @@
     button:hover {
       background-color: #45a049;
     }
+    select {
+      padding: 0.3rem;
+      font-size: 0.9rem;
+    }
     footer {
       position: fixed;
       bottom: 0;
@@ -59,6 +63,21 @@
       text-align: center;
       padding: 0.5rem 0;
       font-size: 0.9rem;
+    }
+    #popupMessage {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+    }
+    #popupMessage.error {
+      background-color: #f44336; /* Red for errors */
     }
   </style>
 </head>
@@ -75,6 +94,7 @@
           <th>Issue Type</th>
           <th>Description</th>
           <th>Location</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -86,10 +106,14 @@
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
+
+  <!-- Popup notification -->
+  <div id="popupMessage"></div>
+
   <script>
     async function fetchReports() {
       try {
-        const response = await fetch('/api/reports'); 
+        const response = await fetch('/api/reports');
         if (!response.ok) throw new Error('Failed to fetch reports');
         const reports = await response.json();
 
@@ -98,7 +122,7 @@
 
         if (reports.length === 0) {
           const row = document.createElement('tr');
-          row.innerHTML = `<td colspan="5" style="text-align: center;">No reports available</td>`;
+          row.innerHTML = `<td colspan="6" style="text-align: center;">No reports available</td>`;
           reportTableBody.appendChild(row);
           return;
         }
@@ -111,6 +135,16 @@
             <td>${report.description}</td>
             <td>${report.location.coordinates.join(', ')}</td>
             <td>
+              <select id="status-${report._id}">
+                <option value="Submitted" ${report.status === 'Submitted' ? 'selected' : ''}>Submitted</option>
+                <option value="Under Review" ${report.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
+                <option value="Reviewed" ${report.status === 'Reviewed' ? 'selected' : ''}>Reviewed</option>
+                <option value="In Progress" ${report.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                <option value="Resolved" ${report.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+              </select>
+            </td>
+            <td>
+              <button onclick="updateStatus('${report._id}')">Update Status</button>
               <button onclick="deleteReport('${report._id}')">Delete</button>
             </td>
           `;
@@ -122,9 +156,32 @@
       }
     }
 
+    async function updateStatus(reportId) {
+      const statusSelect = document.getElementById(`status-${reportId}`);
+      const newStatus = statusSelect.value;
+
+      try {
+        const response = await fetch(`/api/reports/${reportId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+
+        if (!response.ok) throw new Error('Failed to update status');
+        const result = await response.json();
+        showPopup(result.message, false); // Show success popup
+
+        // Optionally refresh the report list
+        fetchReports();
+      } catch (error) {
+        console.error('Error updating status:', error);
+        showPopup('An error occurred while updating the status.', true); // Show error popup
+      }
+    }
+
     async function deleteReport(reportId) {
       try {
-        const response = await fetch(`/api/reports/${reportId}`, { 
+        const response = await fetch(`/api/reports/${reportId}`, {
           method: 'DELETE',
         });
 
@@ -155,7 +212,5 @@
     // Fetch reports when the page loads
     fetchReports();
   </script>
-
-<div id="popupMessage" style="display: none; position: fixed; bottom: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 1rem; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 1000;"></div>
 </body>
 </html>
