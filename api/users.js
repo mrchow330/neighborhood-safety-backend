@@ -33,6 +33,8 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, {
       expiresIn: '1h', // Token expires in 1 hour
     });
+    console.log('JWT_SECRET:', process.env.JWT_SECRET);
+    console.log('Environment Variables:', process.env);
 
     res.status(200).json({ message: 'Login successful', token });
   } catch (err) {
