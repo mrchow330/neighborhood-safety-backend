@@ -135,7 +135,7 @@
             <td>${report.description}</td>
             <td>${report.location.coordinates.join(', ')}</td>
             <td>
-              <select id="status-${report._id}">
+              <select id="status-${report._id}" onchange="updateStatus('${report._id}')">
                 <option value="Submitted" ${report.status === 'Submitted' ? 'selected' : ''}>Submitted</option>
                 <option value="Under Review" ${report.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
                 <option value="Reviewed" ${report.status === 'Reviewed' ? 'selected' : ''}>Reviewed</option>
@@ -144,7 +144,6 @@
               </select>
             </td>
             <td>
-              <button onclick="updateStatus('${report._id}')">Update Status</button>
               <button onclick="deleteReport('${report._id}')">Delete</button>
             </td>
           `;
@@ -170,9 +169,6 @@
         if (!response.ok) throw new Error('Failed to update status');
         const result = await response.json();
         showPopup(result.message, false); // Show success popup
-
-        // Optionally refresh the report list
-        fetchReports();
       } catch (error) {
         console.error('Error updating status:', error);
         showPopup('An error occurred while updating the status.', true); // Show error popup
