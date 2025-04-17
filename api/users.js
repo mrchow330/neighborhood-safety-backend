@@ -1,6 +1,42 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../schemas/User'); // Import the User schema
+const bcrypt = require('bcrypt'); // For password hashing
+const jwt = require('jsonwebtoken'); // For generating tokens
+
+// POST /api/users/login - Login an existing user
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    // Find the user by username
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, {
+      expiresIn: '1h', // Token expires in 1 hour
+    });
+
+    res.status(200).json({ message: 'Login successful', token });
+  } catch (err) {
+    console.error('Error logging in user:', err);
+    res.status(500).json({ error: 'Failed to log in' });
+  }
+});
 
 // POST /api/users - Create a new user
 router.post('/', async (req, res) => {
