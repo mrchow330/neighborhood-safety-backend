@@ -89,12 +89,19 @@
   <script>
     async function fetchReports() {
       try {
-        const response = await fetch('/api/admin/reports');
+        const response = await fetch('/api/reports'); 
         if (!response.ok) throw new Error('Failed to fetch reports');
         const reports = await response.json();
 
         const reportTableBody = document.getElementById('reportTableBody');
         reportTableBody.innerHTML = ''; // Clear existing rows
+
+        if (reports.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="5" style="text-align: center;">No reports available</td>`;
+          reportTableBody.appendChild(row);
+          return;
+        }
 
         reports.forEach(report => {
           const row = document.createElement('tr');
@@ -111,29 +118,44 @@
         });
       } catch (error) {
         console.error('Error fetching reports:', error);
+        showPopup('Failed to fetch reports.', true); // Show error popup
       }
     }
 
     async function deleteReport(reportId) {
       try {
-        const response = await fetch(`/api/admin/reports/${reportId}`, {
+        const response = await fetch(`/api/reports/${reportId}`, { 
           method: 'DELETE',
         });
 
         if (!response.ok) throw new Error('Failed to delete report');
         const result = await response.json();
-        alert(result.message);
+        showPopup(result.message, false); // Show success popup
 
         // Refresh the report list
         fetchReports();
       } catch (error) {
         console.error('Error deleting report:', error);
-        alert('An error occurred while deleting the report.');
+        showPopup('An error occurred while deleting the report.', true); // Show error popup
       }
+    }
+
+    function showPopup(message, isError) {
+      const popup = document.getElementById('popupMessage');
+      popup.textContent = message;
+      popup.className = isError ? 'error' : ''; // Add "error" class for errors
+      popup.style.display = 'block';
+
+      // Hide the popup after 3 seconds
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 3000);
     }
 
     // Fetch reports when the page loads
     fetchReports();
   </script>
+
+<div id="popupMessage" style="display: none; position: fixed; bottom: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 1rem; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 1000;"></div>
 </body>
 </html>

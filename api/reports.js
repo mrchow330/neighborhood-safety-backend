@@ -34,6 +34,36 @@ router.post('/', async (req, res) => {
 });
 
 
+// GET /api/reports - Fetch all reports
+router.get('/', async (req, res) => {
+  try {
+    const reports = await Report.find(); // Fetch all reports from the database
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error('Error fetching reports:', error);
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+
+// DELETE /api/reports/:id - Delete a specific report
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedReport = await Report.findByIdAndDelete(id);
+
+    if (!deletedReport) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    res.status(200).json({ message: 'Report deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting report:', error);
+    res.status(500).json({ error: 'Failed to delete report' });
+  }
+});
+
+
 // GET /api/reports/near - Fetch nearby reports
 router.get('/near', async (req, res) => {
   try {
