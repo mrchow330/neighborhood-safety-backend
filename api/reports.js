@@ -5,7 +5,7 @@ const Report = require('../schemas/Report'); // Import the Report schema
 // POST /api/reports - Create a new report
 router.post('/', async (req, res) => {
   try {
-    const { report_id, issueType, location, description, photoUri, userId } = req.body;
+    const { report_id, issueType, location, description, photoUri} = req.body;
     // Validate that location is provided and in the correct format
     if (!location || !location.coordinates || location.coordinates.length !== 2) {
       return res.status(400).json({ error: 'Location with valid coordinates is required' });
