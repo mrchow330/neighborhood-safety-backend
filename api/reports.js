@@ -22,7 +22,6 @@ router.post('/', async (req, res) => {
       },
       description,
       photoUri,
-      userId,
     });
 
     await report.save();
