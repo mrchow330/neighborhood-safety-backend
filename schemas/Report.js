@@ -13,7 +13,6 @@ const reportSchema = new mongoose.Schema({
   photoUri: String,
   createdAt: { type: Date, default: Date.now },
   status: { type: String, default: "Submitted" }, 
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
 
 // Create a geospatial index on the location field
