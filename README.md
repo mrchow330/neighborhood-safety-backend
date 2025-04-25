@@ -11,35 +11,42 @@ The following dependencies are required to run this project:
   - `mongoose`: For connecting to and interacting with the MongoDB database.
   - `dotenv`: For managing environment variables securely.
   - `cors`: For enabling cross-origin resource sharing.
+  - `bcryptjs`: For hashing passwords in the MongoDb database
+  - `Node-fetch`: Used in Node.js environments to make HTTPS requests
 
 - **Optional**:
   - `nodemon`: For automatically restarting the server during development when file changes are detected.
 
 ## Features
 
-- **Submit Reports**: User reports can be submitted to our database using this server.
 - **Database Integration**: Reports are stored in a MongoDB database for persistence.
-- **Geolocation Support**: Geolocation API integration can be seen here.
 - **API Endpoints**: Provides RESTful API endpoints for submitting and managing reports.
 - **Health Check**: A `/api/health` endpoint provides real-time server status, including database connection status and uptime tracking.
 - **Admin Dashboard**: A central hub for administrators to manage users and reports.
 - **Frontend Integration**: Displays server status and uptime on the frontend, with real-time updates (if need be).
+- **Manage users and reports**: Allows users with admin privaleges to manage regular users and submitted reports easily. 
 
 ## Project Structure
 
 - `server.js`: The main entry point of the application, which sets up the Express server, connects to MongoDB, and handles API routes.
+- `/api`: Contains the main connections for user, report, google maps, and admin databasing.
+  - `admin.js`: API used to login admin users
+  - `google-maps-api.js` (UNUSED): API used to test and - create the map interface.
+  - `reports.js`: API used to create or update reports
+  - `users.js`: API used to create or update existing users
 - `/features`: Contains frontend pages for interacting with the backend.
   - `/admin/`: Contains admin-related pages:
     - `admin-dashboard.html`: The main admin dashboard with links to manage users and reports.
     - `manage-users.html`: Allows admins to view and modify user roles (`isModerator`).
     - `manage-reports.html`: Allows admins to view and delete reports.
-  - `/api-report-tester.html`: A frontend page to test report submission.
-  - `/api-user-tester.html`: A frontend page to test user-related APIs.
-  - `/api-map-tester.html`: A frontend page to test mapping API.
-- `api/admin.js`: Contains routes for admin-related actions, such as managing users and reports.
-- `api/reports.js`: Contains the route for handling report submissions.
 - `schemas/`: Contains Mongoose schemas for the database models.
 - `vercel.json`: Configuration for deploying the backend on Vercel.
+
+### Archived Features
+These features are in the features folder but are not implemented in the current version of this website.
+- `/api-report-tester.html`: A frontend page to test report submission.
+- `/api-user-tester.html`: A frontend page to test user-related APIs.
+- `/api-map-tester.html`: A frontend page to test mapping API.
 
 ## Installation
 
@@ -59,6 +66,8 @@ The following dependencies are required to run this project:
    - `mongoose`
    - `dotenv`
    - `cors`
+   - `bcryptjs`
+   - `node-fetch`
    - `nodemon` (optional)
 
 
@@ -74,6 +83,12 @@ The following dependencies are required to run this project:
 4. Start the server:
    ```bash
    npm start
+   ```
+
+   or 
+
+   ```bash
+   node server.js
    ```
 
 ## API Endpoints
@@ -120,6 +135,41 @@ The following dependencies are required to run this project:
       "createdAt": "2025-04-04T12:34:56.789Z",
       "status": "Submitted"
     }
+  }
+  ```
+
+
+### User Creation
+- **Endpoint**: `/api/users`
+- **Method**: `POST`
+- **Description**: Creates a new user. Usually done on the frontend.
+- **Request Body**:
+  ```json
+  {
+    "first_name": "John",
+    "last_name": "Dole",
+    "username": "Thelegend27",
+    "email": "email@gmail.com",
+    "phone_number": "550-412-4731",
+    "password": "********",
+    "isModerator": false,
+    "createAt": "2025-04-25T12:34:56.789Z"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "message": "User account created successfully",
+    "user": {
+      "first_name": "John",
+      "last_name": "Dole",
+      "username": "Thelegend27",
+      "email": "email@gmail.com",
+      "phone_number": "550-412-4731",
+      "password": "********",
+      "isModerator": false,
+      "createAt": "2025-04-25T12:34:56.789Z"
+      }
   }
   ```
 
