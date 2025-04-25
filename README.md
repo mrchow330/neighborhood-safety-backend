@@ -12,7 +12,7 @@ The following dependencies are required to run this project:
   - `dotenv`: For managing environment variables securely.
   - `cors`: For enabling cross-origin resource sharing.
   - `bcryptjs`: For hashing passwords in the MongoDb database
-  - `Node-fetch`: Used in Node.js environments to make HTTPS requests
+  - `Node-fetch`: Used in Node.js environments to make HTTP requests
 
 - **Optional**:
   - `nodemon`: For automatically restarting the server during development when file changes are detected.
