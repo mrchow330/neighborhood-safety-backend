@@ -126,7 +126,7 @@ router.patch('/:id/status', async (req, res) => {
     // Look up user email from the linked user_id
     const user = await User.findById(report.user_id);
     if (user && user.email) {
-      await sendStatusUpdateEmail(user.email, report.report_id, status);
+      await sendStatusUpdateEmail(user.email, report.report_id, status, user.first_name);
     }
 
     res.status(200).json({ message: 'Status updated and user notified', report });
@@ -152,7 +152,7 @@ router.patch('/bulk-update-status', async (req, res) => {
         const user = await User.findById(updatedReport.userId);
         if (user && user.email) {
           console.log(`Sending email to ${user.email} for report ${updatedReport.report_id}`);
-          await sendStatusUpdateEmail(user.email, updatedReport.report_id, status);
+          await sendStatusUpdateEmail(user.email, updatedReport.report_id, status, user.first_name);
         }
       }
 
