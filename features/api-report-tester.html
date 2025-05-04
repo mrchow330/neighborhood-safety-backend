@@ -197,10 +197,13 @@
         report_id: reportId,
         issueType,
         description,
-        latitude: selectedLatLng.lat,
-        longitude: selectedLatLng.lng,
         photoUri,
+        location: {
+          type: 'Point',
+          coordinates: [selectedLatLng.lng, selectedLatLng.lat],
+        },
       };
+
 
       try {
         const response = await fetch('/api/reports', {
