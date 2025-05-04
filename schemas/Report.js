@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 // Report Schema
 const reportSchema = new mongoose.Schema({
   report_id: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   issueType: String,
-  // location: {type: String, required: true},
   location: { 
     type: { type: String, enum: ['Point'], required: false }, // GeoJSON type
     coordinates: { type: [Number], required: false }, // [longitude, latitude]

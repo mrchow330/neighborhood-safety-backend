@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>API Tester - HoodWatch</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -46,7 +48,15 @@
       font-size: 0.9rem;
       color: #555;
     }
+    #map {
+      height: 400px;
+      margin: 1rem auto;
+      max-width: 600px;
+    }
   </style>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
   <header>
@@ -54,22 +64,59 @@
   </header>
   <main>
     <p>Use this form to test the API by submitting a safety report.</p>
-    <button id="getLocationButton" type="button">Get My Location</button>
+    <button id="getLocationButton" type="button">Use My Location</button>
+
+    <div id="map"></div>
+
     <form id="reportForm">
-      <input type="text" name="issueType" placeholder="Issue Type" required />
+      <select name="issueType" required>
+        <option value="">Select an issue type</option>
+        <option value="pothole">Pothole/Road Damage</option>
+        <option value="streetlight">Streetlight Outage</option>
+        <option value="graffiti">Graffiti</option>
+        <option value="other">Other</option>
+      </select>      
       <textarea name="description" placeholder="Description"></textarea>
+      <input type="file" id="photo" name="photo" accept="image/*" />
       <button type="submit">Submit Report</button>
     </form>
+
     <p id="locationInfo"></p>
     <p id="responseMessage"></p>
   </main>
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
+
   <script>
-    // Add event listener for the "Get My Location" button
-    document.getElementById('getLocationButton').addEventListener('click', () => {
-      const locationInfo = document.getElementById('locationInfo');
+    let selectedLatLng = null;
+    const locationInfo = document.getElementById('locationInfo');
+
+    // Initialize map (default view: Bradley University)
+    const map = L.map('map').setView([40.698063033832845, -89.61534840380354], 17);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+
+    // Allow user to pick a location
+    map.on('click', (e) => {
+      selectedLatLng = e.latlng;
+      const { lat, lng } = e.latlng;
+      locationInfo.textContent = `Selected Location - Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+
+      if (marker) {
+        marker.setLatLng(e.latlng);
+      } else {
+        marker = L.marker(e.latlng).addTo(map);
+      }
+    });
+
+    // Center map on user's location
+    document.getElementById('getLocationButton').addEventListener('click', (event) => {
       event.preventDefault();
 
       if (!navigator.geolocation) {
@@ -80,7 +127,23 @@
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          locationInfo.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+          const latlng = L.latLng(latitude, longitude);
+
+          // Center the map
+          map.setView(latlng, 15);
+
+          // Set selectedLatLng for form submission
+          selectedLatLng = latlng;
+
+          // Update marker on map
+          if (marker) {
+            marker.setLatLng(latlng);
+          } else {
+            marker = L.marker(latlng).addTo(map);
+          }
+
+          // Show user-friendly message
+          locationInfo.textContent = `Your Location Selected - Latitude: ${latitude.toFixed(5)}, Longitude: ${longitude.toFixed(5)}`;
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -89,61 +152,83 @@
       );
     });
 
-    // Add event listener for the report submission form
+    async function uploadToCloudinary(file, reportId) {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('public_id', `report_${reportId}`);
+      data.append('upload_preset', 'neighborhood_safety_app');
+
+      const response = await fetch('https://api.cloudinary.com/v1_1/drpqpcyij/image/upload', {
+        method: 'POST',
+        body: data,
+      });
+
+      const result = await response.json();
+      if (!result.secure_url) {
+        throw new Error('Failed to upload image to Cloudinary');
+      }
+
+      return result.secure_url;
+    }
+
+    // Handle form submission
     document.getElementById('reportForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Generate a unique report ID (e.g., using a timestamp)
       const reportId = `report_${Date.now()}`;
+      const form = e.target;
+      const formData = new FormData(form);
+      const issueType = formData.get('issueType');
+      const description = formData.get('description');
+      const photoFile = formData.get('photo');
 
-      // Collect form data
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData.entries());
-
-      // Get the user's location
-      if (!navigator.geolocation) {
+      if (!selectedLatLng) {
         document.getElementById('responseMessage').textContent =
-          'Geolocation is not supported by your browser.';
+          'Please select a location on the map.';
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-
-          // Construct the reportData object
-          const reportData = {
-            report_id: reportId, // Unique report ID
-            issueType: data.issueType,
-            latitude, // User's latitude
-            longitude, // User's longitude
-            description: data.description,
-            photoUri: "", // Placeholder for now (e.g., if no photo is uploaded)
-          };
-
-          // Send the reportData to the API
-          try {
-            const response = await fetch('/api/reports', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(reportData),
-            });
-
-            const result = await response.json();
-            document.getElementById('responseMessage').textContent =
-              result.message || 'Error submitting report';
-          } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('responseMessage').textContent =
-              'An unexpected error occurred';
-          }
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+      let photoUri = '';
+      if (photoFile && photoFile.size > 0) {
+        try {
+          photoUri = await uploadToCloudinary(photoFile, reportId);
+        } catch (err) {
           document.getElementById('responseMessage').textContent =
-            'Unable to retrieve your location.';
+            'Image upload failed.';
+          return;
         }
-      );
+      }
+
+      const userId = localStorage.getItem('userId');
+
+      const reportData = {
+        report_id: reportId,
+        issueType,
+        description,
+        photoUri,
+        location: {
+          type: 'Point',
+          coordinates: [selectedLatLng.lng, selectedLatLng.lat],
+        },
+        userId,
+      };
+
+
+      try {
+        const response = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reportData),
+        });
+
+        const result = await response.json();
+        document.getElementById('responseMessage').textContent =
+          result.message || 'Error submitting report';
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('responseMessage').textContent =
+          'An unexpected error occurred';
+      }
     });
   </script>
 </body>

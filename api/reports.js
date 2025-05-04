@@ -1,24 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const Report = require('../schemas/Report'); // Import the Report schema
+const Report = require('../schemas/Report');
+const User = require('../schemas/User');
+const sendStatusUpdateEmail = require('../utils/email');
 
 // POST /api/reports - Create a new report
 router.post('/', async (req, res) => {
   try {
-    const { report_id, issueType, location, description, photoUri} = req.body;
-    // Validate that location is provided and in the correct format
+    const { report_id, userId, issueType, location, description, photoUri } = req.body;
+
+    // Validate required fields
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
     if (!location || !location.coordinates || location.coordinates.length !== 2) {
       return res.status(400).json({ error: 'Location with valid coordinates is required' });
     }
 
-    const [longitude, latitude] = location.coordinates; // Extract longitude and latitude
+    const [longitude, latitude] = location.coordinates;
 
     const report = new Report({
       report_id,
+      userId,
       issueType,
       location: {
         type: 'Point',
-        coordinates: [longitude, latitude], // GeoJSON format: [longitude, latitude]
+        coordinates: [longitude, latitude],
       },
       description,
       photoUri,
@@ -105,21 +113,58 @@ router.patch('/:id/status', async (req, res) => {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
-    const updatedReport = await Report.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedReport) {
+    // Find the report and populate user information
+    const report = await Report.findById(id);
+    if (!report) {
       return res.status(404).json({ error: 'Report not found' });
     }
 
-    res.status(200).json({ message: 'Status updated successfully', report: updatedReport });
+    // Update the report status
+    report.status = status;
+    await report.save();
+
+    // Look up user email from the linked user_id
+    const user = await User.findById(report.user_id);
+    if (user && user.email) {
+      await sendStatusUpdateEmail(user.email, report.report_id, status, user.first_name);
+    }
+
+    res.status(200).json({ message: 'Status updated and user notified', report });
   } catch (error) {
-    console.error('Error updating status:', error);
-    res.status(500).json({ error: 'Failed to update status' });
+    console.error('Error updating status and sending email:', error);
+    res.status(500).json({ error: 'Failed to update status and notify user' });
   }
 });
+
+// PATCH /api/reports/bulk-update-status
+router.patch('/bulk-update-status', async (req, res) => {
+  try {
+    const updates = req.body.updates; // [{ id, status }, ...]
+
+    if (!Array.isArray(updates)) {
+      return res.status(400).json({ error: 'Invalid updates format' });
+    }
+
+    const results = await Promise.all(updates.map(async ({ id, status }) => {
+      const updatedReport = await Report.findByIdAndUpdate(id, { status }, { new: true });
+
+      if (updatedReport) {
+        const user = await User.findById(updatedReport.userId);
+        if (user && user.email) {
+          console.log(`Sending email to ${user.email} for report ${updatedReport.report_id}`);
+          await sendStatusUpdateEmail(user.email, updatedReport.report_id, status, user.first_name);
+        }
+      }
+
+      return updatedReport;
+    }));
+
+    res.json({ message: 'Status updates and notifications applied successfully', reports: results });
+  } catch (err) {
+    console.error('Error in bulk update:', err);
+    res.status(500).json({ error: 'Failed to apply status updates' });
+  }
+});
+
 
 module.exports = router;

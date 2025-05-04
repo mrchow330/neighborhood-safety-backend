@@ -109,8 +109,14 @@
 
   <!-- Popup notification -->
   <div id="popupMessage"></div>
-
+  <!-- Confirmation bar for unsaved changes -->
+  <div id="saveBar" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#333; color:#fff; padding:1rem; text-align:center; z-index:999;">
+    <span>You have unsaved status changes.</span>
+    <button onclick="saveAllChanges()" style="margin-left:1rem; padding:0.5rem 1rem; background-color:#4CAF50; border:none; color:white; cursor:pointer;">Save All Changes</button>
+  </div>
   <script>
+    const pendingStatusChanges = {}; // key: reportId, value: new status
+
     async function fetchReports() {
       try {
         const response = await fetch('/api/reports');
@@ -155,23 +161,42 @@
       }
     }
 
-    async function updateStatus(reportId) {
+    function updateStatus(reportId) {
       const statusSelect = document.getElementById(`status-${reportId}`);
       const newStatus = statusSelect.value;
 
+      // Store change in memory
+      pendingStatusChanges[reportId] = newStatus;
+
+      // Show the confirmation bar
+      document.getElementById('saveBar').style.display = 'block';
+    }
+
+    async function saveAllChanges() {
+      const changes = Object.entries(pendingStatusChanges);
+      if (changes.length === 0) return;
+
       try {
-        const response = await fetch(`/api/reports/${reportId}/status`, {
+        const response = await fetch('/api/reports/bulk-update-status', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus }),
+          body: JSON.stringify({ updates: changes.map(([id, status]) => ({ id, status })) }),
         });
 
-        if (!response.ok) throw new Error('Failed to update status');
+        if (!response.ok) throw new Error('Failed to save changes');
         const result = await response.json();
-        showPopup(result.message, false); // Show success popup
+
+        showPopup(result.message || 'Statuses updated successfully.', false);
+        
+        // Clear the pending changes
+        for (const id in pendingStatusChanges) delete pendingStatusChanges[id];
+        document.getElementById('saveBar').style.display = 'none';
+
+        // Refresh the reports
+        fetchReports();
       } catch (error) {
-        console.error('Error updating status:', error);
-        showPopup('An error occurred while updating the status.', true); // Show error popup
+        console.error('Error saving all changes:', error);
+        showPopup('Failed to save status updates.', true);
       }
     }
 
