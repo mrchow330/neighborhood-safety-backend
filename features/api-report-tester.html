@@ -64,7 +64,7 @@
   </header>
   <main>
     <p>Use this form to test the API by submitting a safety report.</p>
-    <button id="getLocationButton" type="button">Center Map on My Location</button>
+    <button id="getLocationButton" type="button">Use My Location</button>
 
     <div id="map"></div>
 
@@ -120,7 +120,23 @@
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          map.setView([latitude, longitude], 15);
+          const latlng = L.latLng(latitude, longitude);
+
+          // Center the map
+          map.setView(latlng, 15);
+
+          // Set selectedLatLng for form submission
+          selectedLatLng = latlng;
+
+          // Update marker on map
+          if (marker) {
+            marker.setLatLng(latlng);
+          } else {
+            marker = L.marker(latlng).addTo(map);
+          }
+
+          // Show user-friendly message
+          locationInfo.textContent = `Your Location Selected - Latitude: ${latitude.toFixed(5)}, Longitude: ${longitude.toFixed(5)}`;
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -128,6 +144,7 @@
         }
       );
     });
+
 
     // Handle form submission
     document.getElementById('reportForm').addEventListener('submit', async (e) => {
