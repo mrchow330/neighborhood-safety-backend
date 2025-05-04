@@ -31,7 +31,7 @@ async function sendStatusUpdateEmail(to, reportId, newStatus, firstName = '') {
   `;
 
   const mailOptions = {
-    from: `"Report Updates" <${process.env.EMAIL_USER}>`,
+    from: `"HoodWatch Status Emails" <${process.env.EMAIL_USER}>`,
     to,
     subject: 'Your Report Status Has Been Updated',
     html: htmlContent
