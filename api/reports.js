@@ -145,12 +145,20 @@ router.patch('/bulk-update-status', async (req, res) => {
       return res.status(400).json({ error: 'Invalid updates format' });
     }
 
-    const updatePromises = updates.map(({ id, status }) =>
-      Report.findByIdAndUpdate(id, { status }, { new: true })
-    );
+    const results = await Promise.all(updates.map(async ({ id, status }) => {
+      const updatedReport = await Report.findByIdAndUpdate(id, { status }, { new: true });
 
-    await Promise.all(updatePromises);
-    res.json({ message: 'Status updates applied successfully' });
+      if (updatedReport) {
+        const user = await User.findById(updatedReport.user_id);
+        if (user && user.email) {
+          await sendStatusUpdateEmail(user.email, updatedReport.report_id, status);
+        }
+      }
+
+      return updatedReport;
+    }));
+
+    res.json({ message: 'Status updates and notifications applied successfully', reports: results });
   } catch (err) {
     console.error('Error in bulk update:', err);
     res.status(500).json({ error: 'Failed to apply status updates' });
