@@ -149,7 +149,7 @@ router.patch('/bulk-update-status', async (req, res) => {
       const updatedReport = await Report.findByIdAndUpdate(id, { status }, { new: true });
 
       if (updatedReport) {
-        const user = await User.findById(updatedReport.user_id);
+        const user = await User.findById(updatedReport.userId);
         if (user && user.email) {
           console.log(`Sending email to ${user.email} for report ${updatedReport.report_id}`);
           await sendStatusUpdateEmail(user.email, updatedReport.report_id, status);
