@@ -69,7 +69,13 @@
     <div id="map"></div>
 
     <form id="reportForm">
-      <input type="text" name="issueType" placeholder="Issue Type" required />
+      <select name="issueType" required>
+        <option value="">Select an issue type</option>
+        <option value="pothole">Pothole/Road Damage</option>
+        <option value="streetlight">Streetlight Outage</option>
+        <option value="graffiti">Graffiti</option>
+        <option value="other">Other</option>
+      </select>      
       <textarea name="description" placeholder="Description"></textarea>
       <input type="file" id="photo" name="photo" accept="image/*" />
       <button type="submit">Submit Report</button>
@@ -193,6 +199,8 @@
         }
       }
 
+      const userId = localStorage.getItem('userId');
+
       const reportData = {
         report_id: reportId,
         issueType,
@@ -202,6 +210,7 @@
           type: 'Point',
           coordinates: [selectedLatLng.lng, selectedLatLng.lat],
         },
+        userId,
       };
 
 

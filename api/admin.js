@@ -26,9 +26,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+ 
     // Login successful
-    res.status(200).json({ message: 'Login successful' });
-  } catch (err) {
+    res.status(200).json({
+      message: 'Login successful',
+      userId: user._id,
+    });
+    } catch (err) {
     console.error('Error during admin login:', err);
     res.status(500).json({ error: 'An unexpected error occurred' });
   }

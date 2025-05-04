@@ -79,7 +79,7 @@
         const result = await response.json();
 
         if (response.ok) {
-          // Redirect to admin dashboard or show success message
+          localStorage.setItem('userId', result.userId); // Save _id
           window.location.href = '/admin-dashboard.html';
         } else {
           // Display error message
