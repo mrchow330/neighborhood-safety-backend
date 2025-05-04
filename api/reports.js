@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Report = require('../schemas/Report'); // Import the Report schema
+const Report = require('../schemas/Report');
+const User = require('../schemas/User');
+const sendStatusUpdateEmail = require('../utils/email');
 
 // POST /api/reports - Create a new report
 router.post('/', async (req, res) => {
@@ -111,20 +113,26 @@ router.patch('/:id/status', async (req, res) => {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
-    const updatedReport = await Report.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedReport) {
+    // Find the report and populate user information
+    const report = await Report.findById(id);
+    if (!report) {
       return res.status(404).json({ error: 'Report not found' });
     }
 
-    res.status(200).json({ message: 'Status updated successfully', report: updatedReport });
+    // Update the report status
+    report.status = status;
+    await report.save();
+
+    // Look up user email from the linked user_id
+    const user = await User.findById(report.user_id);
+    if (user && user.email) {
+      await sendStatusUpdateEmail(user.email, report.report_id, status);
+    }
+
+    res.status(200).json({ message: 'Status updated and user notified', report });
   } catch (error) {
-    console.error('Error updating status:', error);
-    res.status(500).json({ error: 'Failed to update status' });
+    console.error('Error updating status and sending email:', error);
+    res.status(500).json({ error: 'Failed to update status and notify user' });
   }
 });
 
