@@ -16,7 +16,12 @@ async function sendStatusUpdateEmail(to, reportId, newStatus) {
     text: `Your report (ID: ${reportId}) status has been updated to: ${newStatus}.`
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${to}:`, result.response);
+  } catch (err) {
+    console.error(`Error sending email to ${to}:`, err);
+  }
 }
 
 module.exports = sendStatusUpdateEmail;
