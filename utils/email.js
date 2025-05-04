@@ -26,7 +26,7 @@ async function sendStatusUpdateEmail(to, reportId, newStatus, firstName = '') {
       <p><strong>New Status:</strong> <span style="color: #4CAF50;">${newStatus}</span></p>
       <p>Thank you for helping us improve our community!</p>
       <br>
-      <p>– The Team</p>
+      <p>– Team Prodigies</p>
     </div>
   `;
 
