@@ -128,4 +128,26 @@ router.patch('/:id/status', async (req, res) => {
   }
 });
 
+// PATCH /api/reports/bulk-update-status
+router.patch('/bulk-update-status', async (req, res) => {
+  try {
+    const updates = req.body.updates; // [{ id, status }, ...]
+
+    if (!Array.isArray(updates)) {
+      return res.status(400).json({ error: 'Invalid updates format' });
+    }
+
+    const updatePromises = updates.map(({ id, status }) =>
+      Report.findByIdAndUpdate(id, { status }, { new: true })
+    );
+
+    await Promise.all(updatePromises);
+    res.json({ message: 'Status updates applied successfully' });
+  } catch (err) {
+    console.error('Error in bulk update:', err);
+    res.status(500).json({ error: 'Failed to apply status updates' });
+  }
+});
+
+
 module.exports = router;
