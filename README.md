@@ -13,6 +13,7 @@ The following dependencies are required to run this project:
   - `cors`: For enabling cross-origin resource sharing.
   - `bcryptjs`: For hashing passwords in the MongoDb database
   - `Node-fetch`: Used in Node.js environments to make HTTP requests
+  - `Node-mailer`: Used to send emails whenever a status changes on a user's report
 
 - **Optional**:
   - `nodemon`: For automatically restarting the server during development when file changes are detected.
@@ -25,6 +26,7 @@ The following dependencies are required to run this project:
 - **Admin Dashboard**: A central hub for administrators to manage users and reports.
 - **Frontend Integration**: Displays server status and uptime on the frontend, with real-time updates (if need be).
 - **Manage users and reports**: Allows users with admin privaleges to manage regular users and submitted reports easily. 
+- **Send automated emails**: Allows the system to send automatic emails whenever the status of a report changes
 
 ## Project Structure
 
@@ -39,12 +41,13 @@ The following dependencies are required to run this project:
     - `admin-dashboard.html`: The main admin dashboard with links to manage users and reports.
     - `manage-users.html`: Allows admins to view and modify user roles (`isModerator`).
     - `manage-reports.html`: Allows admins to view and delete reports.
+  - `api-report-tester.html`: A frontend page to test report submission.
 - `schemas/`: Contains Mongoose schemas for the database models.
 - `vercel.json`: Configuration for deploying the backend on Vercel.
 
 ### Archived Features
 These features are in the features folder but are not implemented in the current version of this website.
-- `/api-report-tester.html`: A frontend page to test report submission.
+
 - `/api-user-tester.html`: A frontend page to test user-related APIs.
 - `/api-map-tester.html`: A frontend page to test mapping API.
 
