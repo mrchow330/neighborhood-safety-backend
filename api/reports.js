@@ -52,21 +52,17 @@ router.get('/', async (req, res) => {
   }
 });
 
-
-// DELETE /api/reports/:id - Delete a specific report
-router.delete('/:id', async (req, res) => {
+// Route to get report by ID
+router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedReport = await Report.findByIdAndDelete(id);
-
-    if (!deletedReport) {
-      return res.status(404).json({ error: 'Report not found' });
+    const report = await Report.findById(req.params.id); // Fetch report by ID from the database
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
     }
-
-    res.status(200).json({ message: 'Report deleted successfully' });
+    res.json(report);
   } catch (error) {
-    console.error('Error deleting report:', error);
-    res.status(500).json({ error: 'Failed to delete report' });
+    console.error('Error fetching report:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

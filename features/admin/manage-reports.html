@@ -79,11 +79,77 @@
     #popupMessage.error {
       background-color: #f44336; /* Red for errors */
     }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: auto;
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 600px;
+    }
+    .modal-header {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .modal-body {
+      margin-bottom: 20px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    #reportModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow: auto;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+
+    #modalBody p {
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Manage Reports</h1>
+  <header style="display: flex; align-items: center; justify-content: center; position: relative; padding: 2.35rem; background-color: #4CAF50; color: white;">
+    <button 
+      onclick="window.location.href='/admin-dashboard.html'" 
+      style="position: absolute; left: 1rem; font-size: 3rem; background: none; color: white; border: none; cursor: pointer;">
+      &#8592;
+    </button>
+    <h1 style="margin: 0;">Manage Reports</h1>
   </header>
   <main>
     <h2>List of Reports</h2>
@@ -91,21 +157,26 @@
       <thead>
         <tr>
           <th>Report ID</th>
+          <th>Creation Date</th>
           <th>Issue Type</th>
-          <th>Description</th>
-          <th>Location</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody id="reportTableBody">
-        <!-- Report rows will be dynamically added here -->
       </tbody>
     </table>
   </main>
   <footer>
     <p>&copy; 2025 Team Prodigies</p>
   </footer>
+
+  <div id="reportModal" style="display: none;">
+    <h2 id="modalHeader"></h2>
+    <div id="modalBody"></div>
+    <button onclick="document.getElementById('reportModal').style.display='none'">Close</button>
+  </div>
+  
 
   <!-- Popup notification -->
   <div id="popupMessage"></div>
@@ -114,6 +185,7 @@
     <span>You have unsaved status changes.</span>
     <button onclick="saveAllChanges()" style="margin-left:1rem; padding:0.5rem 1rem; background-color:#4CAF50; border:none; color:white; cursor:pointer;">Save All Changes</button>
   </div>
+
   <script>
     const pendingStatusChanges = {}; // key: reportId, value: new status
 
@@ -137,9 +209,8 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${report.report_id}</td>
+            <td>${new Date(report.createdAt).toLocaleDateString()}</td>
             <td>${report.issueType}</td>
-            <td>${report.description}</td>
-            <td>${report.location.coordinates.join(', ')}</td>
             <td>
               <select id="status-${report._id}" onchange="updateStatus('${report._id}')">
                 <option value="Submitted" ${report.status === 'Submitted' ? 'selected' : ''}>Submitted</option>
@@ -150,7 +221,7 @@
               </select>
             </td>
             <td>
-              <button onclick="deleteReport('${report._id}')">Delete</button>
+              <button onclick="viewFullInfo('${report._id}')">View Full Info</button>
             </td>
           `;
           reportTableBody.appendChild(row);
@@ -216,6 +287,46 @@
         console.error('Error deleting report:', error);
         showPopup('An error occurred while deleting the report.', true); // Show error popup
       }
+    }
+
+    async function viewFullInfo(reportId) {
+      try {
+        const response = await fetch(`/api/reports/${reportId}`);
+        if (!response.ok) throw new Error('Failed to fetch report details');
+        const report = await response.json();
+
+        // Fetch user details based on report.userId
+        const userResponse = await fetch(`/api/users/${report.userId}`);
+        if (!userResponse.ok) throw new Error('Failed to fetch user details');
+        const user = await userResponse.json();
+
+        // Populate the modal with report details
+        const modalHeader = document.getElementById('modalHeader');
+        modalHeader.textContent = `Report ID: ${report.report_id}`;
+
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = `
+          <p><strong>Submitted by:</strong> ${user.username}</p>
+          <p><strong>Issue Type:</strong> ${report.issueType}</p>
+          <p><strong>Location:</strong> ${report.location.coordinates.join(', ')}</p>
+          <p><strong>Description:</strong> ${report.description}</p>
+          <p><strong>Creation Date:</strong> ${new Date(report.createdAt).toLocaleDateString()}</p>
+          <p><strong>Status:</strong> ${report.status}</p>
+          <p><strong>Photo:</strong> <img src="${report.photoUri}" alt="Report photo" width="100" /></p>
+        `;
+
+        // Display the modal
+        document.getElementById('reportModal').style.display = 'block';
+      } catch (error) {
+        console.error('Error fetching report details:', error);
+        showPopup('Failed to fetch report details.', true); // Show error popup
+      }
+    }
+
+
+    // Close modal function
+    function closeModal() {
+      document.getElementById('reportModal').style.display = 'none';
     }
 
     function showPopup(message, isError) {

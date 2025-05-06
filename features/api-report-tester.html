@@ -59,9 +59,15 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
-  <header>
-    <h1>API Tester</h1>
+  <header style="display: flex; align-items: center; justify-content: center; position: relative; padding: 2.35rem; background-color: #4CAF50; color: white;">
+    <button 
+      onclick="window.location.href='/admin-dashboard.html'" 
+      style="position: absolute; left: 1rem; font-size: 3rem; background: none; color: white; border: none; cursor: pointer;">
+      &#8592;
+    </button>
+    <h1 style="margin: 0;">API Tester</h1>
   </header>
+  
   <main>
     <p>Use this form to test the API by submitting a safety report.</p>
     <button id="getLocationButton" type="button">Use My Location</button>
