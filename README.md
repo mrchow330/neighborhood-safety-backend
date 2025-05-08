@@ -2,8 +2,20 @@
 
 This repository contains the backend API for the Neighborhood Safety App. The backend is built using Node.js and Express.js and is responsible for handling user-submitted safety reports and user data, storing them in a MongoDB database. This backend server also provides endpoints for interacting with the data. The main goal of this backend website is to act as a server to create the main connection and communication between the app and our MongoDB database remotely. That way, our team can test its functionalities locally without starting a local MongoDB connection as well every time.
 
-## Dependencies
 
+## Features
+
+- **Database Integration**: Reports are stored in a MongoDB database for persistence.
+- **API Endpoints**: Provides RESTful API endpoints for submitting and managing reports.
+- **Health Check**: A `/api/health` endpoint provides real-time server status, including database connection status and uptime tracking.
+- **Admin Dashboard**: A central hub for administrators to manage users and reports.
+- **Frontend Integration**: Displays server status and uptime on the frontend, with real-time updates (if need be).
+- **Manage users and reports**: Allows users with admin privaleges to manage regular users and submitted reports easily. 
+- **Send automated emails**: Allows the system to send automatic emails whenever the status of a report changes
+
+## Installation & Setup
+
+### Prequisites
 The following dependencies are required to run this project:
 
 - **Required**:
@@ -18,15 +30,55 @@ The following dependencies are required to run this project:
 - **Optional**:
   - `nodemon`: For automatically restarting the server during development when file changes are detected.
 
-## Features
 
-- **Database Integration**: Reports are stored in a MongoDB database for persistence.
-- **API Endpoints**: Provides RESTful API endpoints for submitting and managing reports.
-- **Health Check**: A `/api/health` endpoint provides real-time server status, including database connection status and uptime tracking.
-- **Admin Dashboard**: A central hub for administrators to manage users and reports.
-- **Frontend Integration**: Displays server status and uptime on the frontend, with real-time updates (if need be).
-- **Manage users and reports**: Allows users with admin privaleges to manage regular users and submitted reports easily. 
-- **Send automated emails**: Allows the system to send automatic emails whenever the status of a report changes
+### Installation Steps
+1. Clone the repository:
+   ```bash
+   git clone <github.com/mrchow330/neighborhood-safety-backend>
+   ```
+
+2. Navigate to the project folder:
+    ```bash
+    cd neighborhood-safety-backend
+    ```
+
+3. Install dependencies using:
+   ```bash
+   npm install
+   ```
+
+   Dependencies to install:
+   - `express`
+   - `mongoose`
+   - `dotenv`
+   - `cors`
+   - `bcryptjs`
+   - `node-fetch`
+   - `nodemon` (optional)
+
+
+3. Set up environment variables:
+   - Create a `.env` file in the root directory.
+   - Add the following variables:
+     ```env
+     MONGO_URI=<your-mongodb-connection-string>
+     EMAIL_USER=<your-email-address>
+     EMAIL_PASS=<your-email-password>
+     GOOGLE_MAPS_API_KEY=<your-google-maps-api-key>
+     ```
+   - **Note**: It is recommended to generate an app-specific password for the email. To learn more, visit this website: https://support.google.com/accounts/answer/185833?hl=en
+
+4. Start the server:
+   ```bash
+   npm start
+   ```
+
+   or 
+
+   ```bash
+   node server.js
+   ```
+
 
 ## Project Structure
 
@@ -51,48 +103,6 @@ These features are in the features folder but are not implemented in the current
 - `/api-user-tester.html`: A frontend page to test user-related APIs.
 - `/api-map-tester.html`: A frontend page to test mapping API.
 
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <github.com/mrchow330/neighborhood-safety-backend>
-   cd neighborhood-safety-backend
-   ```
-
-2. Install dependencies using:
-   ```bash
-   npm install
-   ```
-
-   Dependencies to install:
-   - `express`
-   - `mongoose`
-   - `dotenv`
-   - `cors`
-   - `bcryptjs`
-   - `node-fetch`
-   - `nodemon` (optional)
-
-
-3. Set up environment variables:
-   - Create a `.env` file in the root directory.
-   - Add the following variables:
-     ```env
-     MONGO_URI=<your-mongodb-connection-string>
-     PORT=3000
-     ```
-   - **WARNING**: Ensure your `.env` file is added to `.gitignore` to prevent it from being uploaded to the repository and running into security risks (since your MongoDB connection will contain your password).
-
-4. Start the server:
-   ```bash
-   npm start
-   ```
-
-   or 
-
-   ```bash
-   node server.js
-   ```
 
 ## API Endpoints
 
@@ -193,16 +203,7 @@ These features are in the features folder but are not implemented in the current
   - **Endpoint**: `/api/admin/reports/:id`
   - **Method**: `DELETE`
   - **Description**: Deletes a specific report.
-
-## Frontend Features
-
-- **Admin Dashboard**:
-  - `admin-dashboard.html`: Provides links to manage users and reports.
-  - `manage-users.html`: Allows admins to view and modify user roles (`isModerator`)
-  - `manage-reports.html`: Allows admins to view and delete reports.
-- **Health Status Display**: The `features/health.html` page displays the server's health status (`Server is running` or `Server is down`) and uptime in a user-friendly format.
-- **Real-Time Updates**: The health status and uptime are updated every second using JavaScript.
--**Map Visualization**: The `api-map-tester.html` page displays a map using Leaflet.
+  
 
 ## Deployment
 
