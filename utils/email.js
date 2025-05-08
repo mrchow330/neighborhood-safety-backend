@@ -45,4 +45,42 @@ async function sendStatusUpdateEmail(to, reportId, newStatus, firstName = '') {
   }
 }
 
+/**
+ * Sends an email to the user with a link to verify their email address.
+ * @param {string} to - Recipient email address
+ * @param {string} verificationLink - The unique link the user needs to click
+ * @param {string} [firstName] - Optional user's first name
+ */
+async function sendVerificationEmail(to, verificationLink, firstName = '') {
+  const nameGreeting = firstName ? `Hello ${firstName},` : `Hello,`;
+
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h2>Verify Your HoodWatch Account</h2>
+      <p>${nameGreeting}</p>
+      <p>Thank you for signing up for HoodWatch!</p>
+      <p>Please click the following link to verify your email address:</p>
+      <p><a href="${verificationLink}">${verificationLink}</a></p>
+      <p>This link will expire in 24 hours.</p>
+      <p>If you did not create an account, please ignore this email.</p>
+      <br>
+      <p>– Team Prodigies</p>
+    </div>
+  `;
+
+  const mailOptions = {
+    from: `"HoodWatch Account Verification" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: 'Verify Your HoodWatch Account',
+    html: htmlContent
+  };
+
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${to} (Verification):`, result.response);
+  } catch (err) {
+    console.error(`Error sending email to ${to} (Verification):`, err);
+  }
+}
+
 module.exports = sendStatusUpdateEmail;
