@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs'); // Use bcryptjs instead of bcrypt
 const jwt = require('jsonwebtoken'); // For generating tokens
 const {v4: uuidv4} = require('uuid');
 const EmailVerificationToken = require('../schemas/EmailVerificationToken'); //new schema for email verification 
+const sendVerificationEmail = require('../utils/email');
 
 // POST /api/users/login - Login an existing user
 router.post('/login', async (req, res) => {
@@ -91,7 +92,19 @@ router.post('/', async (req, res) => {
     )
     await newVerificationToken.save();
 
-    res.status(201).json({ message: 'User account created successfully. Please check your email to verify your account.', user });
+    if (user.email) {
+      const verificationLink = `${req.protocol}://${req.get('host')}/api/auth/verify-email?token=${verificationToken}`;
+      try {
+        await sendVerificationEmail(user.email, verificationLink, user.first_name);
+        console.log('Verification email sent successfully');
+      } catch (error) {
+        console.error('Error sending verification email:', error);
+      }
+
+      res.status(201).json({ message: 'User account created successfully. Please check your email to verify your account.', user });
+    } else {
+      res.status(201).json({ message: 'User account created successfully.', user });
+    }
   } catch (err) {
     if (err.code === 11000) {
       // Handle duplicate key error
