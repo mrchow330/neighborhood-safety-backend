@@ -3,6 +3,8 @@ const router = express.Router();
 const User = require('../schemas/User'); // Import the User schema
 const bcrypt = require('bcryptjs'); // Use bcryptjs instead of bcrypt
 const jwt = require('jsonwebtoken'); // For generating tokens
+const {v4: uuidv4} = require('uuid');
+const EmailVerificationToken = require('../schemas/EmailVerificationToken'); //new schema for email verification 
 
 // POST /api/users/login - Login an existing user
 router.post('/login', async (req, res) => {
@@ -70,10 +72,26 @@ router.post('/', async (req, res) => {
       email: email || null,
       phone_number: phone_number || null,
       password: hashedPassword, // Save the hashed password
+      isEmailVerified: false,
     });
     await user.save();
 
-    res.status(201).json({ message: 'User account created successfully', user });
+    //generate and store unique token for email verification
+    const verificationToken = uuidv4();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const newVerificationToken = new EmailVerificationToken(
+      {
+        userId: user._id,
+        token: verificationToken,
+        created: new Date(),
+        expires: expiresAt,
+
+      }
+    )
+    await newVerificationToken.save();
+
+    res.status(201).json({ message: 'User account created successfully. Please check your email to verify your account.', user });
   } catch (err) {
     if (err.code === 11000) {
       // Handle duplicate key error
