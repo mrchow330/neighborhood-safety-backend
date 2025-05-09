@@ -14,7 +14,6 @@ app.use(cors());
 //   res.send('Backend test successful!');
 // });
 
-console.log('MONGO_URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -23,11 +22,6 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch(err => {
   console.error('MongoDB connection error:', err.message);
 });
-
-
-// User Schema
-const User = require('./schemas/User');
-
 
 // Serve static files
 app.use('/features', express.static(path.join(__dirname, 'features')));
