@@ -34,22 +34,15 @@ router.post('/login', async (req, res) => {
       expiresIn: '1h',
     });
 
-    const { _id, email, first_name, last_name, phone_number, isModerator, createdAt } = user;
-
     res.status(200).json({
       message: 'Login successful',
       token,
       userId: _id,
-      user: {
-        userId: _id,
-        username,
-        email,
-        first_name,
-        last_name,
-        phone_number,
-        isModerator,
-        createdAt,
-      },
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      phone_number: user.phone_number,
+
     });
   } catch (err) {
     console.error('Error logging in user:', err);
@@ -131,7 +124,7 @@ router.post('/', async (req, res) => {
 // GET /api/users/:id - Get a user by ID
 router.get('/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('username email');
+    const user = await User.findById(req.params.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
