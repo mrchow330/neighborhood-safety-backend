@@ -24,11 +24,6 @@ mongoose.connect(process.env.MONGO_URI, {
   console.error('MongoDB connection error:', err.message);
 });
 
-
-// User Schema
-const User = require('./schemas/User');
-
-
 // Serve static files
 app.use('/features', express.static(path.join(__dirname, 'features')));
 
