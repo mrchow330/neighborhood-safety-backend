@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../schemas/User');
 const EmailVerificationToken = require('../schemas/EmailVerificationToken');
+require('dotenv').config();
 
 // GET /api/auth/verify-email
 router.get('/verify-email', async (req, res) => {
