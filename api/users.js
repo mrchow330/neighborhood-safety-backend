@@ -88,7 +88,8 @@ router.post('/', async (req, res) => {
 
     if (user.email) {
       console.log('checking user email.')
-      const verificationLink = `${req.protocol}://${req.get('host')}/api/auth/verify-email?token=${verificationToken}`;
+      const verificationLink = `https://neighborhood-safety-app.vercel.app/login/verification?token=${verificationToken}`;
+      
       try {
         await sendVerificationEmail(user.email, verificationLink, user.first_name);
         console.log('Verification email sent successfully');
