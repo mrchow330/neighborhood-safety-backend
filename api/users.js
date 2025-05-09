@@ -1,10 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../schemas/User'); // Import the User schema
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); // Use bcryptjs instead of bcrypt
+const jwt = require('jsonwebtoken'); // For generating tokens
+const {v4: uuidv4} = require('uuid');
+const EmailVerificationToken = require('../schemas/EmailVerificationToken'); //new schema for email verification 
+const sendVerificationEmail = require('../utils/email').sendVerificationEmail;
+require('dotenv').config();
 
 // POST /api/users/login - Login an existing user
+
+console.log('Backend is alive in /api/users!');
+
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -36,6 +43,7 @@ router.post('/login', async (req, res) => {
 
 // POST /api/users - Create a new user
 router.post('/', async (req, res) => {
+  console.log('Backend is alive in /api/users!');
   try {
     const { first_name, last_name, username, email, phone_number, password } = req.body;
 
@@ -55,11 +63,46 @@ router.post('/', async (req, res) => {
       username,
       email: email || null,
       phone_number: phone_number || null,
-      password: hashedPassword,
+      password: hashedPassword, // Save the hashed password
+      isVerified: false,
     });
+    
+    console.log('User object before save:', user); 
     await user.save();
+    console.log('User object after save:', user.toObject()); 
 
-    res.status(201).json({ message: 'User account created successfully', user });
+    //generate and store unique token for email verification
+    const verificationToken = uuidv4();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const newVerificationToken = new EmailVerificationToken(
+      {
+        userId: user._id,
+        token: verificationToken,
+        created: new Date(),
+        expires: expiresAt,
+
+      }
+    )
+    await newVerificationToken.save();
+
+    if (user.email) {
+      console.log('checking user email.')
+      const verificationLink = `${req.protocol}://${req.get('host')}/api/auth/verify-email?token=${verificationToken}`;
+      try {
+        await sendVerificationEmail(user.email, verificationLink, user.first_name);
+        console.log('Verification email sent successfully');
+      } catch (error) {
+        console.error('Error sending verification email:', error);
+      }
+      console.log('Created User Object:', user.toObject());
+      res.status(201).json({
+        message: 'User account created successfully. Please check your email to verify your account.',
+        user: user.toObject()
+      });
+    } else {
+      res.status(201).json({ message: 'User account created successfully.', user });
+    }
   } catch (err) {
     if (err.code === 11000) {
       return res.status(400).json({ error: 'Username or email already exists' });

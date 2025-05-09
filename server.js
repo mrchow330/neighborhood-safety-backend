@@ -9,6 +9,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// app.get('/test-backend', (req, res) => {
+//   console.log('Test backend route hit!');
+//   res.send('Backend test successful!');
+// });
+
 console.log('MONGO_URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -144,6 +149,10 @@ app.get('/near', async (req, res) => {
 // API Route to admin login
 const adminRoute = require('./api/admin'); // Import the admin route
 app.use('/api/admin', adminRoute); // Use the admin route
+
+// API route for authentication/verification
+const authRoute = require('./api/auth');
+app.use('/api/auth', authRoute);
 
 
 // Export for Vercel
