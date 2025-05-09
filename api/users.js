@@ -8,10 +8,10 @@ const EmailVerificationToken = require('../schemas/EmailVerificationToken'); //n
 const sendVerificationEmail = require('../utils/email').sendVerificationEmail;
 require('dotenv').config();
 
-// POST /api/users/login - Login an existing user
 
 console.log('Backend is alive in /api/users!');
 
+// POST /api/users/login - Login an existing user
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -39,7 +39,16 @@ router.post('/login', async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.status(200).json({ message: 'Login successful', token, username: user.username, userId: user._id });
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      userId: user._id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      phone_number: user.phone_number,
+
+    });
   } catch (err) {
     console.error('Error logging in user:', err);
     res.status(500).json({ error: 'Failed to log in' });
@@ -121,7 +130,7 @@ router.post('/', async (req, res) => {
 // GET /api/users/:id - Get a user by ID
 router.get('/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('username email');
+    const user = await User.findById(req.params.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
