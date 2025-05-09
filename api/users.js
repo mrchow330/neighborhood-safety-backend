@@ -8,10 +8,10 @@ const EmailVerificationToken = require('../schemas/EmailVerificationToken'); //n
 const sendVerificationEmail = require('../utils/email').sendVerificationEmail;
 require('dotenv').config();
 
-// POST /api/users/login - Login an existing user
 
 console.log('Backend is alive in /api/users!');
 
+// POST /api/users/login - Login an existing user
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.status(200).json({ message: 'Login successful', token, username: user.username, userId: user._id });
+    res.status(200).json({ message: 'Login successful', token, username: user.username, userId: user._id, first_name: user.first_name, last_name: user.last_name, email: user.email, phone_number: user.phone_number });
   } catch (err) {
     console.error('Error logging in user:', err);
     res.status(500).json({ error: 'Failed to log in' });
