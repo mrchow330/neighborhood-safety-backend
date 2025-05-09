@@ -127,6 +127,75 @@ router.post('/', async (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
+=======
+// GET /api/users/verify - Verify user email
+router.get('/verify', async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).send('Verification token is required.');
+    }
+
+    // Find the verification token
+    const verificationToken = await EmailVerificationToken.findOne({ token });
+
+    if (!verificationToken) {
+      return res.status(400).send('Invalid or expired verification token.');
+    }
+
+    // Check if the token has expired
+    if (verificationToken.expires < new Date()) {
+      return res.status(400).send('Verification token has expired.');
+    }
+
+    // Mark the user as verified
+    const user = await User.findByIdAndUpdate(
+      verificationToken.userId,
+      { isVerified: true },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send('User not found.');
+    }
+
+    // Delete the verification token after successful verification
+    await EmailVerificationToken.findByIdAndDelete(verificationToken._id);
+
+    // Send a simple HTML response
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Email Verified</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+          }
+          h1 {
+            color: #4CAF50;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Email Verified!</h1>
+        <p>Your email has been successfully verified. You can now log in to your account.</p>
+      </body>
+      </html>
+    `);
+  } catch (err) {
+    console.error('Error verifying user:', err);
+    res.status(500).send('An error occurred while verifying the account.');
+  }
+});
+
+>>>>>>> Stashed changes
 // GET /api/users/:id - Get a user by ID
 router.get('/:id', async (req, res) => {
   try {
