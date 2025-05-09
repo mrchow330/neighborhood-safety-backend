@@ -1,12 +1,21 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-const transporter = nodemailer.createTransport({
+const statusUpdateTransporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   }
 });
+
+const verificationTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth:{
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASSWORD,
+  }
+})
 
 /**
  * Sends a personalized, styled email to notify the user of a status update.
@@ -38,7 +47,7 @@ async function sendStatusUpdateEmail(to, reportId, newStatus, firstName = '') {
   };
 
   try {
-    const result = await transporter.sendMail(mailOptions);
+    const result = await statusUpdateTransporter.sendMail(mailOptions);
     console.log(`Email sent to ${to}:`, result.response);
   } catch (err) {
     console.error(`Error sending email to ${to}:`, err);
@@ -69,18 +78,18 @@ async function sendVerificationEmail(to, verificationLink, firstName = '') {
   `;
 
   const mailOptions = {
-    from: `"HoodWatch Account Verification" <${process.env.EMAIL_USER}>`,
+    from: `"HoodWatch Account Verification" <${process.env.GMAIL_USER}>`,
     to,
     subject: 'Verify Your HoodWatch Account',
     html: htmlContent
   };
 
   try {
-    const result = await transporter.sendMail(mailOptions);
+    const result = await verificationTransporter.sendMail(mailOptions);
     console.log(`Email sent to ${to} (Verification):`, result.response);
   } catch (err) {
     console.error(`Error sending email to ${to} (Verification):`, err);
   }
 }
 
-module.exports = sendStatusUpdateEmail;
+module.exports = {sendStatusUpdateEmail, sendVerificationEmail};
