@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Report = require('../schemas/Report');
 const User = require('../schemas/User');
-const sendStatusUpdateEmail = require('../utils/email');
+const {sendStatusUpdateEmail} = require('../utils/email');
 
 // POST /api/reports - Create a new report
 router.post('/', async (req, res) => {
