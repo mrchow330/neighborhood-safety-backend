@@ -9,11 +9,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// app.get('/test-backend', (req, res) => {
-//   console.log('Test backend route hit!');
-//   res.send('Backend test successful!');
-// });
-
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
