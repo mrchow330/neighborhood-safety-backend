@@ -14,7 +14,6 @@ app.use(cors());
 //   res.send('Backend test successful!');
 // });
 
-console.log('MONGO_URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
