@@ -34,7 +34,22 @@ router.post('/login', async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.status(200).json({ message: 'Login successful', token, username: user.username, userId: user._id, first_name: user.first_name, last_name: user.last_name, email: user.email, phone_number: user.phone_number });
+    const { _id, email, first_name, last_name, phone_number, isModerator, createdAt } = user;
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        userId: _id,
+        username,
+        email,
+        first_name,
+        last_name,
+        phone_number,
+        isModerator,
+        createdAt,
+      },
+    });
   } catch (err) {
     console.error('Error logging in user:', err);
     res.status(500).json({ error: 'Failed to log in' });
