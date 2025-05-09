@@ -68,7 +68,7 @@ async function sendVerificationEmail(to, verificationLink, firstName = '') {
       <h2>Verify Your HoodWatch Account</h2>
       <p>${nameGreeting}</p>
       <p>Thank you for signing up for HoodWatch!</p>
-      <p>Please click the following link to verify your email address:</p>
+      <p>Please click or copy and paste the following link to verify your email address:</p>
       <p><a href="${verificationLink}">${verificationLink}</a></p>
       <p>This link will expire in 24 hours.</p>
       <p>If you did not create an account, please ignore this email.</p>

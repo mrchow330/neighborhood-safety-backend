@@ -24,31 +24,31 @@ router.get('/verify-email', async (req, res) => {
     if (verificationTokenRecord.expiresAt < new Date()) {
       await EmailVerificationToken.deleteOne({ _id: verificationTokenRecord._id });
       res.status(400).json({ error: 'Verification token has expired. Please request a new one.' });
-      return res.redirect(`hoodwatch://email-verification-failed?error=expired-token`); // Redirect on expiry
+      return res.redirect(`https://neighborhood-safety-app.vercel.app/login/verification?error=Token is expired`); // Redirect on expiry
     }
 
     // Find the user 
     const user = await User.findById(verificationTokenRecord.userId);
 
     if (!user) {
-        return res.redirect(`hoodwatch://email-verification-failed?error=invalid-user`); // Redirect on invalid user
+        return res.redirect(`https://neighborhood-safety-app.vercel.app/login/verification?error=invalid user`); // Redirect on invalid user
     }
 
     // Mark the user as verified
-    user.isEmailVerified = true;
+    user.isVerified = true;
     await user.save();
     // Delete the used  token
     await EmailVerificationToken.deleteOne({ _id: verificationTokenRecord._id });
     res.status(200).json({ message: 'Email verified successfully!' });
 
     // Redirect to the app with a success message (using the custom scheme)
-     return res.redirect(`hoodwatch://email-verified?message=Email%20verified%20successfully!`);
+     return res.status(200).json({ message: 'Email verified successfully!' });
 
     
   } catch (error) {
     console.error('Error verifying email:', error);
     res.status(500).json({ error: 'Failed to verify email.' });
-    return res.redirect(`hoodwatch://email-verification-failed?error=server-error`); // Redirect on server error    
+    return res.redirect(`https://neighborhood-safety-app.vercel.app/login/verification?error=Server failed to verify`); // Redirect on server error    
   }
 });
 
