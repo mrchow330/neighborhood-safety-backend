@@ -172,12 +172,32 @@ router.get('/verify', async (req, res) => {
         <title>Email Verified</title>
         <style>
           body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #F8FAFC;
+            font-family: 'Nunito', sans-serif;
           }
           h1 {
-            color: #4CAF50;
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1e3a8a;
+            font-weight: bold;
+          }
+          p {
+            color: #1E293B;
+            font-size: 16px;
+            text-align: center;
+          }
+          img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 20px;
           }
         </style>
       </head>
